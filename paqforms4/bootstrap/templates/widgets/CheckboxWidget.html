@@ -1,0 +1,18 @@
+{% from "macros.html" import form_group, prepend_append, print_label with context %}
+
+{% call form_group(field, attrs, 'Checkbox') %}
+    <div class="controls">
+        {% call print_label(field, widget.caption, description, tooltip, attrs=Attrs(class='checkbox', required=False)) %}
+            {% call prepend_append(prepend, append, attrs) %}
+                {% do attrs.update({'type': 'checkbox'}) %}
+                {% do attrs.setdefault('name', field.fullname) %}
+                {% do attrs.setdefault('id', field.fullname) %}
+                {% do attrs.setdefault('value', '1') %}
+                {% do attrs.setdefault('checked', True if field.format() == '1' else False) %}
+                <input {{ attrs }}/>
+            {% endcall %}
+        {% endcall %}
+    </div>
+
+    {{ field.alerts() }}
+{% endcall %}

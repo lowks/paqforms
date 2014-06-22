@@ -1,0 +1,33 @@
+{% from "macros.html" import form_group, prepend_append, print_label with context %}
+
+{% call form_group(field, attrs, 'Select') %}
+    {{ print_label(field, widget.caption, description, tooltip, attrs=Attrs(required=attrs['required'])) }}
+
+    <div class="controls">
+        {% call prepend_append(prepend, append, attrs) %}
+            {% do attrs.update({'class': attrs['class'] + 'form-control'}) %}
+            {% do attrs.update({'multiple': widget.multiple}) %}
+            {% do attrs.update({'name': field.fullname}) %}
+            {% do attrs.update({'id': field.fullname}) %}
+            <select {{ attrs }}>
+                {% set optcaptions = widget.options or field.choices %}
+                {% for i, value in enumerate(field.choices) %}
+                    {% if optcaptions %}
+                        {% set optcaption = optcaptions[i] %}
+                    {% endif %}
+                    {% if widget.get_option_caption %}
+                        {% set optcaption = widget.get_option_caption(optcaption) if optcaption else '' %}
+                    {% endif %}
+                    {% set optattrs = Attrs(value=field.format_value(value), selected=field.is_chosen(value)) %}
+                    {% if isinstance(optcaption, tuple) %}
+                        {% set optcaption, _optattrs = optcaption %}
+                        {% do optattrs.update(_optattrs) %}
+                    {% endif %}
+                    <option {{ optattrs }}>{{ optcaption }}</option>
+                {% endfor %}
+            </select>
+        {% endcall %}
+    </div>
+
+    {{ field.alerts() }}
+{% endcall %}

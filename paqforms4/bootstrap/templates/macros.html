@@ -1,0 +1,82 @@
+{% macro form_group(field, attrs, data_widget=None) %} {# PURE #}
+    {#
+    `form-group` provides:
+        - horizontal form support
+        - margin-bottom
+        - messages highlighting
+        - correct fieldset layout
+    #}
+    {% set attrs = Attrs.take_prefixed(attrs, 'group-') %}
+    {% do attrs.update({'class': attrs['class'] + 'form-group'}) %}
+    {% if field.messages.error %}
+        {% do attrs.update({'class': attrs['class'] + 'error'}) %}
+    {% elif field.messages.success %}
+        {% do attrs.update({'class': attrs['class'] + 'success'}) %}
+    {% elif field.messages.warning %}
+        {% do attrs.update({'class': attrs['class'] + 'warning'})%}
+    {% elif field.messages.info %}
+        {% do attrs.update({'class': attrs['class'] + 'info'}) %}
+    {% endif %}
+    {% if not widget.caption %}
+        {% do attrs.update({'class': attrs['class'] + 'nocaption'}) %}
+    {% endif %}
+    {% do attrs.setdefault('data-name', field.fullname) %}
+    {% do attrs.setdefault('data-widget', data_widget) %}
+    {% do attrs.setdefault('id', 'group-' ~ field.fullname) %}
+    <div {{ attrs }}>
+        {{ caller() }}
+    </div>
+{% endmacro %}
+
+{% macro prepend_append(prepend, append, attrs) %} {# PURE #}
+    {% set prepend_attrs = Attrs.take_prefixed(attrs, 'prepend-') %}
+    {% set append_attrs = Attrs.take_prefixed(attrs, 'append-') %}
+    {% do prepend_attrs.update({'class': prepend_attrs['class'] + 'input-group-addon'}) %}
+    {% do append_attrs.update({'class': append_attrs['class'] + 'input-group-addon'}) %}
+    {% if prepend and append %}
+        <div class="input-group input-group-prepend input-group-append">
+            <span {{ prepend_attrs }}>{{ prepend }}</span>
+            {{ caller() }}
+            <span {{ append_attrs }}>{{ append }}</span>
+        </div>
+    {% elif prepend %}
+        <div class="input-group input-group-prepend">
+            <span {{ prepend_attrs }}>{{ prepend }}</span>
+            {{ caller() }}
+        </div>
+    {% elif append %}
+        <div class="input-group input-group-append">
+            {{ caller() }}
+            <span {{ append_attrs }}>{{ append }}</span>
+        </div>
+    {% else %}
+        {{ caller() }}
+    {% endif %}
+{% endmacro %}
+
+{% macro print_label(field, caption, description, tooltip, attrs) %} {# PURE #}
+    {% set attrs = attrs.copy() %}
+    {% do attrs.update({'class': attrs['class'] ~ ' control-label'}) %}
+    {% do attrs.update({'for': attrs['for'] or field.fullname}) %}
+    {% do attrs.update({'required': attrs.get('required', field.required)}) %}
+    {% if caller %}
+        <label {{ attrs }}>
+            {{ caller() }} {{ caption or '&nbsp;' }}
+            {%- if description -%}
+                <span class="descr">{{ description }}</span>
+            {%- endif -%}
+            {%- if tooltip -%}
+                <a href="#" data-toggle="tooltip" title="{{ tooltip }}"><i class="icon-tooltip fa fa-question-circle"></i></a>
+            {%- endif -%}
+        </label>
+    {% else %}
+        <label {{ attrs }}>{{ caption or '&nbsp;' }}
+            {%- if description -%}
+                <span class="descr">{{ description }}</span>
+            {%- endif %}
+            {%- if tooltip -%}
+                <a href="#" data-toggle="tooltip" title="{{ tooltip }}"><i class="icon-tooltip fa fa-question-circle"></i></a>
+            {%- endif -%}
+        </label>
+    {% endif %}
+{% endmacro %}

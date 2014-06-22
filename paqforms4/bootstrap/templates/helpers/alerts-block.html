@@ -1,0 +1,34 @@
+{% if field.has_error %}
+    <div class="alert alert-block alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <p>{{ __('Form contains errors') }}</p>
+    </div>
+{% endif %}
+
+{% for message in field.messages.get('success', []) if message %}
+    <div class="alert alert-block alert-success alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <p>{{ __(message) }}</p>
+    </div>
+{% endfor %}
+
+{% for message in field.messages.get('error', []) if message %}
+    <div class="alert alert-block alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <p>{{ __(message) }}</p>
+    </div>
+{% endfor %}
+
+{% for message in field.messages.get('warning', []) if message %}
+    <div class="alert alert-block alert-warning alert-dismissable">
+        <button class="close" data-dismiss="alert" type="button">&times;</button>
+        <p>{{ __(message) }}</p>
+    </div>
+{% endfor %}
+
+{% for message in field.messages.get('info', []) if message %}
+    <div class="alert alert-block alert-info alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <p>{{ __(message) }}</p>
+    </div>
+{% endfor %}

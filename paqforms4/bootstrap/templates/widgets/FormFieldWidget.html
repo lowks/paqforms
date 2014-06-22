@@ -1,0 +1,15 @@
+{% from "macros.html" import form_group, print_label with context %}
+
+{% call form_group(field, attrs, 'FormField') %}
+    {{ print_label(field, widget.caption, description, tooltip, attrs=Attrs(required=attrs['required'])) }}
+
+    <div class="controls">
+        <div class="{% if widget.inline %} form-inline{% endif %}{% if widget.compact %} form-compact{% endif %}">
+            {% for subfield in field.fields.values() %}
+                {{ subfield(attrs=Attrs.take_prefixed(attrs, subfield.name)) }}
+            {% endfor %}
+        </div>
+    </div>
+
+    {{ field.alerts() }}
+{% endcall %}

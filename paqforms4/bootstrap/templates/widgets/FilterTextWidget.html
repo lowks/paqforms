@@ -1,0 +1,14 @@
+{% from "macros.html" import form_group, print_label with context %}
+
+{% call form_group(field, attrs, 'FilterText') %}
+    {{ print_label(field, widget.caption, description, tooltip, attrs=Attrs(required=attrs['required'])) }}
+
+    <div class="controls"><div class="form-inline form-compact">
+        {{ field.fields['command'](attrs=attrs) }}
+        {{ field.fields['starts_with'](attrs={'group-class': 'hidden'}) }}
+        {{ field.fields['contains'](attrs={'group-class': 'hidden'}) }}
+        {{ field.fields['equals'](attrs={'group-class': 'hidden'}) }}
+        {{ field.fields['not_equals'](attrs={'group-class': 'hidden'}) }}
+        {{ field.fields['empty'](attrs={'group-class': 'hidden'}) }}
+    </div></div>
+{% endcall %}

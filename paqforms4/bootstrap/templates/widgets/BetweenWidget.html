@@ -1,0 +1,11 @@
+{% from "macros.html" import form_group, print_label with context %}
+
+{% call form_group(field, attrs, 'Between') %}
+    {{ print_label(field, widget.caption, description, tooltip, attrs=Attrs(required=attrs['required'])) }}
+
+    <div class="controls"><div class="form-inline form-compact">
+        {{ field.fields['min'](attrs={'class': 'input-mini'}, prepend=_('from')) }}
+        {{ field.fields['max'](attrs={'class': 'input-mini'}, prepend=_('to')) }}
+    </div></div>
+{% endcall %}
+

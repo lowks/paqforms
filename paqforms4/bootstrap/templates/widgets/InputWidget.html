@@ -1,0 +1,18 @@
+{% from "macros.html" import form_group, prepend_append, print_label with context %}
+
+{% call form_group(field, attrs, 'Input') %}
+    {{ print_label(field, widget.caption, description, tooltip, attrs=Attrs(required=attrs['required'])) }}
+
+    <div class="controls">
+        {% call prepend_append(prepend, append, attrs) %}
+            {% do attrs.setdefault('type', widget.type) %}
+            {% do attrs.setdefault('name', field.fullname) %}
+            {% do attrs.setdefault('id', field.fullname) %}
+            {% do attrs.setdefault('value', field.format()) %}
+            {% do attrs.update({'class': attrs['class'] + 'form-control'}) %}
+            <input {{ attrs }}/>
+        {% endcall %}
+    </div>
+
+    {{ field.alerts() }}
+{% endcall %}

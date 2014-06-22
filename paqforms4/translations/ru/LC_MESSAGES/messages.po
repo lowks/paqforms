@@ -1,0 +1,138 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2013 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-05-13 14:11+0300\n"
+"PO-Revision-Date: 2013-11-28 15:31+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: fields.py:237
+msgid "Fill the field"
+msgstr "Заполните поле"
+
+#: fields.py:266 validators.py:138 tests/test_i18n.py:7 tests/test_i18n.py:8
+msgid "Invalid value"
+msgstr "Некорректное значение"
+
+#: fields.py:569 fields.py:611 mongoengine/fields.py:41
+msgid "Invalid value {!r} for defined `choices`"
+msgstr "Некорректное значение {!r} для заданных `choices`"
+
+#: fields.py:658
+msgid "starts_with"
+msgstr "начинается с"
+
+#: fields.py:658
+msgid "contains"
+msgstr "содержит"
+
+#: fields.py:658
+msgid "equals"
+msgstr "равно"
+
+#: fields.py:658
+msgid "not_equals"
+msgstr "не равно"
+
+#: fields.py:658
+msgid "empty"
+msgstr "не заполнено"
+
+#: validators.py:58 tests/test_i18n.py:9 tests/test_i18n.py:10
+#, fuzzy
+msgid "Length <> {exact}"
+msgstr "Длина <> {exact}"
+
+#: validators.py:63
+#, fuzzy
+msgid "Length is not between [{min}:{max}]"
+msgstr "Длина вне диапазона [{min}:{max}]"
+
+#: validators.py:68
+#, fuzzy
+msgid "Length < {min}"
+msgstr "Длина < {min}"
+
+#: validators.py:73
+#, fuzzy
+msgid "Length > {max}"
+msgstr "Длина > {max}"
+
+#: validators.py:110
+msgid "Value <> {exact}"
+msgstr "Значение <> {exact}"
+
+#: validators.py:115
+msgid "Value is not between [{min}:{max}]"
+msgstr "Значение вне диапазона [{min}:{max}]"
+
+#: validators.py:120
+msgid "Value < {min}"
+msgstr "Значение < {min}"
+
+#: validators.py:125
+msgid "Value > {max}"
+msgstr "Значение > {max}"
+
+#: validators.py:153
+msgid "Invalid input"
+msgstr "Некорректный ввод"
+
+#: validators.py:169
+msgid "Invalid email"
+msgstr "Некорректный email"
+
+#: validators.py:189
+msgid "Invalid URL"
+msgstr "Некорректный URL"
+
+#: validators.py:203
+msgid "Invalid field name {fieldname}"
+msgstr "Некорректное имя поля {fieldname}"
+
+#: validators.py:207
+msgid "Must be equal to {othercaption}"
+msgstr "Должно быть равно полю {othercaption}"
+
+#: validators.py:237
+msgid "One of the objects has the following error"
+msgstr "Один из объектов имеет след. ошибку"
+
+#: bootstrap/templates/alerts.html:4
+msgid "Form contains errors"
+msgstr "Форма содержит ошибки"
+
+#: bootstrap/templates/widgets/BetweenWidget.html:6
+#: bootstrap/templates/widgets/FilterRangeWidget.html:9
+msgid "from"
+msgstr "от"
+
+#: bootstrap/templates/widgets/BetweenWidget.html:7
+#: bootstrap/templates/widgets/FilterRangeWidget.html:10
+msgid "to"
+msgstr "до"
+
+#: bootstrap/templates/widgets/FileRichWidget.html:17
+msgid "Choose file"
+msgstr "Выберите файл"
+
+#: bootstrap/templates/widgets/FileRichWidget.html:23
+msgid "Hold Ctrl-key to select multiple files"
+msgstr "Удерживайте Ctrl для выбора нескольких файлов"
+
+#: bootstrap/templates/widgets/FileRichWidget.html:33
+msgid "Uploaded"
+msgstr "Загружено"

@@ -1,0 +1,133 @@
+# Translations template for PROJECT.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-05-13 14:11+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: fields.py:237
+msgid "Fill the field"
+msgstr ""
+
+#: fields.py:266 validators.py:138 tests/test_i18n.py:7 tests/test_i18n.py:8
+msgid "Invalid value"
+msgstr ""
+
+#: fields.py:569 fields.py:611 mongoengine/fields.py:41
+msgid "Invalid value {!r} for defined `choices`"
+msgstr ""
+
+#: fields.py:658
+msgid "starts_with"
+msgstr ""
+
+#: fields.py:658
+msgid "contains"
+msgstr ""
+
+#: fields.py:658
+msgid "equals"
+msgstr ""
+
+#: fields.py:658
+msgid "not_equals"
+msgstr ""
+
+#: fields.py:658
+msgid "empty"
+msgstr ""
+
+#: validators.py:58 tests/test_i18n.py:9 tests/test_i18n.py:10
+msgid "Length <> {exact}"
+msgstr ""
+
+#: validators.py:63
+msgid "Length is not between [{min}:{max}]"
+msgstr ""
+
+#: validators.py:68
+msgid "Length < {min}"
+msgstr ""
+
+#: validators.py:73
+msgid "Length > {max}"
+msgstr ""
+
+#: validators.py:110
+msgid "Value <> {exact}"
+msgstr ""
+
+#: validators.py:115
+msgid "Value is not between [{min}:{max}]"
+msgstr ""
+
+#: validators.py:120
+msgid "Value < {min}"
+msgstr ""
+
+#: validators.py:125
+msgid "Value > {max}"
+msgstr ""
+
+#: validators.py:153
+msgid "Invalid input"
+msgstr ""
+
+#: validators.py:169
+msgid "Invalid email"
+msgstr ""
+
+#: validators.py:189
+msgid "Invalid URL"
+msgstr ""
+
+#: validators.py:203
+msgid "Invalid field name {fieldname}"
+msgstr ""
+
+#: validators.py:207
+msgid "Must be equal to {othercaption}"
+msgstr ""
+
+#: validators.py:237
+msgid "One of the objects has the following error"
+msgstr ""
+
+#: bootstrap/templates/alerts.html:4
+msgid "Form contains errors"
+msgstr ""
+
+#: bootstrap/templates/widgets/BetweenWidget.html:6
+#: bootstrap/templates/widgets/FilterRangeWidget.html:9
+msgid "from"
+msgstr ""
+
+#: bootstrap/templates/widgets/BetweenWidget.html:7
+#: bootstrap/templates/widgets/FilterRangeWidget.html:10
+msgid "to"
+msgstr ""
+
+#: bootstrap/templates/widgets/FileRichWidget.html:17
+msgid "Choose file"
+msgstr ""
+
+#: bootstrap/templates/widgets/FileRichWidget.html:23
+msgid "Hold Ctrl-key to select multiple files"
+msgstr ""
+
+#: bootstrap/templates/widgets/FileRichWidget.html:33
+msgid "Uploaded"
+msgstr ""
+

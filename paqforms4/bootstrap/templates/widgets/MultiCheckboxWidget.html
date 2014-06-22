@@ -1,0 +1,40 @@
+{% from "macros.html" import form_group, prepend_append, print_label with context %}
+
+{% call form_group(field, attrs, 'MultiCheckbox') %}
+    <fieldset>
+        <legend>
+            {% call print_label(field, widget.caption, description, tooltip, attrs=Attrs(class='checkbox', required=attrs['required'])) %}
+                <input data-tag="toggler" id="{{ field.fullname }}" type="checkbox"/>
+            {% endcall %}
+        </legend>
+
+        {% set cbcaptions = widget.options or field.choices %}
+        {% for i, value in enumerate(field.choices) %}
+            {% if cbcaptions %}
+                {% set cbcaption = cbcaptions[i] %}
+            {% endif %}
+            {% if widget.get_option_caption %}
+                {% set cbcaption = widget.get_option_caption(cbcaption) if cbcaption else '' %}
+            {% endif %}
+            {% set cbattrs = Attrs(attrs,
+                type = 'checkbox',
+                value = field.format_value(value),
+                checked = field.is_chosen(value),
+                name = field.fullname ~ '-' ~ (i + 1),
+                id = field.fullname ~ '-' ~ field.format_value(value)
+            ) %}
+            {% if isinstance(cbcaption, tuple) %}
+                {% set cbcaption, _cbattrs = cbcaption %}
+                {% do cbattrs.update(_cbattrs) %}
+            {% endif %}
+
+            <div class="controls">
+                {% call print_label(field, cbcaption, attrs=Attrs(class='checkbox', for=cbattrs['id'], required=False)) %}
+                    <input {{ cbattrs }}/>
+                {% endcall %}
+            </div>
+        {% endfor %}
+    </fieldset>
+
+    {{ field.alerts() }}
+{% endcall %}

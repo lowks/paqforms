@@ -1,0 +1,5 @@
+{% do attrs.update({'type': widget.type}) %}
+{% do attrs.update({'name': field.fullname}) %}
+{% do attrs.update({'id': field.fullname}) %}
+{% do attrs.update({'value': field.format()}) %}
+<input {{ attrs }}/>
