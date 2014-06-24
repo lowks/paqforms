@@ -8,13 +8,15 @@
             {% endcall %}
         </legend>
 
-        {% set cbcaptions = widget.options or field.choices %}
         {% for i, value in enumerate(field.choices) %}
-            {% if cbcaptions %}
-                {% set cbcaption = cbcaptions[i] %}
-            {% endif %}
-            {% if widget.get_option_caption %}
-                {% set cbcaption = widget.get_option_caption(cbcaption) if cbcaption else '' %}
+            {% if widget.options %}
+                {% set cbcaption = widget.options[i] %}
+            {% else %}
+                {% if widget.get_option_caption %}
+                    {% set cbcaption = widget.get_option_caption(value) %}
+                {% else %}
+                    {% set cbcaption = field.format_value(value) %}
+                {% endif %}
             {% endif %}
             {% set cbattrs = Attrs(attrs,
                 type = 'checkbox',
