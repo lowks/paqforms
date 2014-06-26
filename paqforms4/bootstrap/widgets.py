@@ -177,10 +177,11 @@ class SelectWidget(Widget):
 
 
 class MultiCheckboxWidget(Widget):
-    def __init__(self, caption, options=[], get_option_caption=None, attrs={}, template=None, template_dirs=[], **context):
+    def __init__(self, caption, options=[], get_option_caption=None, show_toggler=True, attrs={}, template=None, template_dirs=[], **context):
         Widget.__init__(self, caption, attrs, template, template_dirs, **context)
         self.options = options
         self.get_option_caption = get_option_caption
+        self.show_toggler = show_toggler
 
 
 # FILTER WIDGETS

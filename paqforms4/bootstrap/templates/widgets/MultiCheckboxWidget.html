@@ -3,9 +3,13 @@
 {% call form_group(field, attrs, 'MultiCheckbox') %}
     <fieldset>
         <legend>
-            {% call print_label(field, widget.caption, description, tooltip, attrs=Attrs(class='checkbox', required=attrs['required'])) %}
-                <input data-tag="toggler" id="{{ field.fullname }}" type="checkbox"/>
-            {% endcall %}
+            {% if widget.show_toggler %}
+                {% call print_label(field, widget.caption, description, tooltip, attrs=Attrs(class='checkbox', required=attrs['required'])) %}
+                    <input data-tag="toggler" id="{{ field.fullname }}" type="checkbox"/>
+                {% endcall %}
+            {% else %}
+                {{ print_label(field, widget.caption, description, tooltip, attrs=Attrs(class='checkbox', required=attrs['required'])) }}
+            {% endif %}
         </legend>
 
         {% for i, value in enumerate(field.choices) %}
