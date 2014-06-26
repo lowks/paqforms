@@ -9,9 +9,9 @@ pip install git+https://github.com/ivan-kleshnin/paqforms
 ## FAQ
 
 Q: Is there any difference between
-```form.value['foo']```
+`form.value['foo']`
 and
-```form.fields['foo'].value```
+`form.fields['foo'].value`
 
 A: Yes. The `form.value` always builds on `model` object so fields which are
 not user-defined in `model` can be impossible to set in some ORM / ODM. As an option,
@@ -22,4 +22,4 @@ So if you've defined some field only in Form and that field has nothing to deal 
 (captcha field being a good example) it's better to check the value via 
 `form.fields['foo'].value` 
 than 
-```form.value['foo']```
+`form.value['foo']`
