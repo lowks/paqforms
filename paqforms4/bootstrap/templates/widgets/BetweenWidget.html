@@ -6,6 +6,9 @@
     <div class="controls"><div class="form-inline form-compact">
         {{ field.fields['min'](attrs={'class': 'input-mini'}, prepend=_('from')) }}
         {{ field.fields['max'](attrs={'class': 'input-mini'}, prepend=_('to')) }}
+        {% if 'unit' in field.fields %}
+            {{ field.fields['unit'](attrs={'class': 'input-mini'}) }}
+        {% endif %}
     </div></div>
 {% endcall %}
 
