@@ -17,7 +17,7 @@ class StrConverter:
             data = data.strip()
             if data:
                 if self.parse_handler:
-                    data = parse_handler(data)
+                    data = self.parse_handler(data)
                 return data
             else:
                 return None
