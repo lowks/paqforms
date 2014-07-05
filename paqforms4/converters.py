@@ -8,19 +8,21 @@ import babel.dates
 
 
 class StrConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
+    def __init__(self, parse_handler=None):
+        self.parse_handler = parse_handler
 
 
     def parse(self, data, locale='en'):
         if isinstance(data, str):
             data = data.strip()
             if data:
+                if self.parse_handler:
+                    data = parse_handler(data)
                 return data
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -30,41 +32,9 @@ class StrConverter:
         return data
 
 
-class StrLowerConverter(StrConverter):
-    def parse(self, data, locale='en'):
-        value = StrConverter.parse(self, data, locale)
-        if isinstance(value, str):
-            return value.lower()
-        else:
-            return value
-
-
-class StrReverseConverter(StrConverter):
-    def parse(self, data, locale='en'):
-        value = StrConverter.parse(self, data, locale)
-        if isinstance(value, str):
-            return value[::-1]
-        else:
-            return value
-
-
-    def format(self, value, locale='en'):
-        if value is None:
-            return ''
-        else:
-            return value[::-1]
-
-
-class StrUpperConverter(StrConverter):
-    def parse(self, data, locale='en'):
-        value = StrConverter.parse(self, data, locale)
-        if isinstance(value, str):
-            return value.upper()
-
-
 class BoolConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
+    def __init__(self, none=None):
+        self.none = none
 
 
     def parse(self, data, locale='en'):
@@ -82,9 +52,9 @@ class BoolConverter:
                 else:
                     raise ValueError
             else:
-                return None
+                return self.none
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return self.none
         else:
             raise TypeError
 
@@ -95,10 +65,6 @@ class BoolConverter:
 
 
 class IntConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
-
-
     def parse(self, data, locale='en'):
         if type(data) == int:
             return data
@@ -114,7 +80,7 @@ class IntConverter:
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -125,10 +91,6 @@ class IntConverter:
 
 
 class FloatConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
-
-
     def parse(self, data, locale='en'):
         if isinstance(data, float):
             return data
@@ -144,7 +106,7 @@ class FloatConverter:
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -155,10 +117,6 @@ class FloatConverter:
 
 
 class DecimalConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
-
-
     def parse(self, data, locale='en'):
         if isinstance(data, decimal.Decimal):
             return data
@@ -176,7 +134,7 @@ class DecimalConverter:
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -187,8 +145,7 @@ class DecimalConverter:
 
 
 class DateConverter:
-    def __init__(self, none_value=None, coerce_to_date=False):
-        self.none_value = none_value
+    def __init__(self, coerce_to_date=False):
         self.coerce_to_date = coerce_to_date
 
 
@@ -210,7 +167,7 @@ class DateConverter:
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -222,10 +179,6 @@ class DateConverter:
 
 
 class DateTimeConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
-
-
     def parse(self, data, locale='en'):
         if isinstance(data, datetime.datetime):
             return data
@@ -253,7 +206,7 @@ class DateTimeConverter:
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -265,10 +218,6 @@ class DateTimeConverter:
 
 
 class CutNonNumConverter:
-    def __init__(self, none_value=None):
-        self.none_value = none_value
-
-
     def parse(self, data, locale='en'):
         if isinstance(data, str):
             if data:
@@ -276,7 +225,7 @@ class CutNonNumConverter:
             else:
                 return None
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return None
         else:
             raise TypeError
 
@@ -287,8 +236,7 @@ class CutNonNumConverter:
 
 
 class SplitConverter:
-    def __init__(self, none_value=lambda: [], delimiter='\n'):
-        self.none_value = none_value
+    def __init__(self, delimiter='\n'):
         self.delimiter = delimiter
 
 
@@ -300,7 +248,7 @@ class SplitConverter:
             else:
                 return []
         elif data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return []
         else:
             raise TypeError
 
@@ -311,19 +259,18 @@ class SplitConverter:
 
 
 class FilterConverter:
-    def __init__(self, func=None, none_value=lambda: []):
+    def __init__(self, func=None):
         self.func = func
-        self.none_value = none_value
 
 
     def parse(self, data, locale='en'):
         if data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return []
         elif isinstance(data, (list, tuple)):
             result = list(filter(self.func, data))
+            return result
         else:
             raise TypeError
-        return result
 
 
     def format(self, value, locale='en'):
@@ -331,22 +278,25 @@ class FilterConverter:
 
 
 class FilterValueConverter:
-    def __init__(self, func=None, none_value=lambda: []):
+    def __init__(self, func=None, nondata_keys=[]):
         self.func = func
-        self.none_value = none_value
+        self.nondata_keys = nondata_keys
 
 
     def parse(self, data, locale='en'):
         if data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return []
         elif isinstance(data, dict):
             if self.func:
                 result = {key: value for (key, value) in data.items() if self.func(value)}
             else:
                 result = {key: value for (key, value) in data.items() if value is not None}
+            if set(result) == set(self.nondata_keys):
+                return {}
+            else:
+                return result
         else:
             raise TypeError
-        return result
 
 
     def format(self, value, locale='en'):
@@ -354,14 +304,13 @@ class FilterValueConverter:
 
 
 class MapConverter:
-    def __init__(self, converter=None, none_value=lambda: []):
+    def __init__(self, converter=None):
         self.converter = converter
-        self.none_value = none_value
 
 
     def parse(self, data, locale='en'):
         if data is None:
-            return self.none_value() if callable(self.none_value) else self.none_value
+            return []
         elif isinstance(data, (list, tuple)):
             if self.converter:
                 result = [self.converter.parse(d, locale) for d in data]
@@ -384,8 +333,7 @@ class MapConverter:
 
 
 __all__ = (
-    'StrConverter', 'StrLowerConverter', 'StrUpperConverter', 'StrReverseConverter',
-    'BoolConverter', 'IntConverter', 'FloatConverter',
+    'StrConverter', 'BoolConverter', 'IntConverter', 'FloatConverter',
     'DecimalConverter', 'DateConverter', 'DateTimeConverter', 'CutNonNumConverter',
     'SplitConverter', 'FilterConverter', 'FilterValueConverter', 'MapConverter',
 )

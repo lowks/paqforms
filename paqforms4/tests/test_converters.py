@@ -298,7 +298,7 @@ class _Test_MapConverter:
 class Test_Converters:
     def test_parse(self):
         data = 'JAC,Came,back'
-        converters = [SplitConverter(delimiter=','), MapConverter(StrLowerConverter()), MapConverter(StrReverseConverter())]
+        converters = [SplitConverter(delimiter=','), MapConverter(StrConverter(parse_handler=Str.lower)), MapConverter(StrConverter(parse_handler=lambda v: v[::-1]))]
         for converter in converters:
             data = converter.parse(data)
         assert data == ['JAC'.lower()[::-1], 'Came'.lower()[::-1], 'back'.lower()[::-1]]

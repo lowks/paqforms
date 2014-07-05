@@ -14,8 +14,7 @@ __all__ = (
     'Attrs', 'Attr', 'variable_decode', 'variable_encode', 'form_encode',
 
     # CONVERTERS
-    'StrConverter', 'StrLowerConverter', 'StrUpperConverter', 'StrReverseConverter',
-    'BoolConverter', 'IntConverter', 'FloatConverter',
+    'StrConverter', 'BoolConverter', 'IntConverter', 'FloatConverter',
     'DecimalConverter', 'DateConverter', 'DateTimeConverter', 'CutNonNumConverter',
     'SplitConverter', 'FilterConverter', 'FilterValueConverter', 'MapConverter',
 
@@ -29,7 +28,7 @@ __all__ = (
     'ChoiceField', 'MultiChoiceField',
 
     # FIELDS / SHORTCUTS
-    'TextField', 'UnsignedField', 'CheckField',  'DateField', 'DateTimeField',
+    'TextField', 'CheckField', 'DateField', 'DateTimeField',
     'BetweenField', 'BetweenDateField', 'BetweenDateTimeField',
     'FilterTextField', 'FilterRangeField', 'FilterDateField', 'FilterDateTimeField',
 

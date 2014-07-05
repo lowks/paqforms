@@ -870,19 +870,9 @@ def TextField(widget, default=None, required=False, converters=StrConverter(), v
     return Field(widget, default, required, converters, validators, name=name)
 
 
-def UnsignedField(widget, default=None, required=False, converters=IntConverter(), validators=ValueValidator(min=0), name=None):
-    widget = widgets.make_widget(widget, widgets.TextWidget)
-    return Field(widget, default, required, converters, validators, name=name)
-
-
-def PriceField(widget, default=None, required=False, converters=DecimalConverter(), validators=ValueValidator(min=0), name=None):
-    widget = widgets.make_widget(widget, widgets.TextWidget)
-    return Field(widget, default, required, converters, validators, name=name)
-
-
 def CheckField(widget, default=None, required=False, validators=[], name=None):
     widget = widgets.make_widget(widget, widgets.CheckboxWidget)
-    return Field(widget, default, required, converters=BoolConverter(none_value=False), validators=validators, name=name)
+    return Field(widget, default, required, converters=BoolConverter(none=False), validators=validators, name=name)
 
 
 def DateField(widget, default=None, required=False, validators=[], name=None):
@@ -935,8 +925,6 @@ __all__ = (
 
     # SHORTCUTS
     'TextField',
-    'UnsignedField',
-    'PriceField',
     'CheckField',
     'DateField',
     'DateTimeField',
