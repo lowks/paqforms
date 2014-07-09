@@ -9,7 +9,7 @@ from ..html import *
 
 # WIDGETS
 def make_widget(widget, widget_class, **kwargs):
-    if widget is not None:
+    if widget is not False:
         if isinstance(widget, str):
             widget = widget_class(widget, **kwargs)
         elif isinstance(widget, dict):
