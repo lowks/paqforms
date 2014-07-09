@@ -51,7 +51,7 @@ from .converters import *
 from .validators import *
 from .helpers import *
 from .i18n import get_translations
-from .bootstrap import widgets
+from .bootstrap.widgets import *
 
 
 # METACLASSES ==================================================================
@@ -94,11 +94,11 @@ class DeclarativeMeta(OrderedClass):
 
 # FIELDS =======================================================================
 def make_field(field, field_class, **kwargs):
-    if field is not None:
+    if field is not False:
         if isinstance(field, dict):
             widget = kwargs.pop('widget', '') or field.pop('widget', '')
             field = field_class(widget, **dict(kwargs, **field))
-        elif isinstance(field, type(...)):
+        elif field is None:
             widget = kwargs.pop('widget', '')
             field = field_class(widget, **kwargs)
         else:
@@ -171,7 +171,7 @@ class Field(Prototype, metaclass=OrderedClass):
     autorender = True
 
     def __init__(self, widget, default=None, required=False, converters=[], validators=[], name=None):
-        self.widget = widgets.make_widget(widget, widgets.Widget)
+        self.widget = make_widget(widget, Widget)
         self.default = default
         self.required = required
 
@@ -277,7 +277,7 @@ class Field(Prototype, metaclass=OrderedClass):
 
 class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (need to check length!)
     def __init__(self, widget, prototype, default=[], required=False, converters=[], validators=[], name=None):
-        self.widget = widgets.make_widget(widget, widgets.FieldFieldWidget)
+        self.widget = make_widget(widget, FieldFieldWidget)
         if isinstance(prototype, Prototype):
             self.prototype = prototype
         else:
@@ -391,7 +391,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
 
 class FormField(Prototype, metaclass=OrderedClass):
     def __init__(self, widget, prototypes, default={}, converters=[], validators=[], name=None):
-        self.widget = widgets.make_widget(widget, widgets.FormFieldWidget)
+        self.widget = make_widget(widget, FormFieldWidget)
         if hasattr(prototypes, 'prototypes'):
             self.prototypes = prototypes.prototypes
         elif isinstance(prototypes, Sequence):
@@ -560,7 +560,7 @@ class BaseForm(FormField, metaclass=DeclarativeMeta):
         name = None,
     ):
         name = name or self.meta.get('name', None)
-        FormField.__init__(self, widgets.FormWidget(''), self.prototypes, default, name=name)
+        FormField.__init__(self, FormWidget(''), self.prototypes, default, name=name)
         self._locale = babel.core.Locale.parse(locale or 'en')
         self._translations = get_translations(self._locale) if isinstance(translations, gettext.NullTranslations) else translations
         self.feed(model, data, submit)
@@ -599,7 +599,7 @@ class ChoiceField(Field):
         validators = [],
         name = None
     ):
-        widget = widgets.make_widget(widget, widgets.SelectWidget)
+        widget = make_widget(widget, SelectWidget)
         self.choices = choices
         Field.__init__(self, widget, default, required, converters, validators, name)
 
@@ -640,13 +640,9 @@ class MultiChoiceField(Field):
         validators = [],
         name = None
     ):
-        widget = widgets.make_widget(widget, widgets.MultiCheckboxWidget)
+        widget = make_widget(widget, MultiCheckboxWidget)
         self.choices = choices
         Field.__init__(self, widget, default, required, converters, validators, name)
-
-
-    # def feed(self, value, data=None, submit=False):
-    #     return Field.feed(self, value or [], data or [], submit)
 
 
     # HIGH-LEVEL API
@@ -692,212 +688,236 @@ class BetweenField(FormField):
         min_field,
         max_field,
         unit_field = None,
-        converters = [],
-        validators = [],
+        shared = {},
         name = None,
     ):
-        widget = widgets.make_widget(widget, widgets.BetweenWidget)
-        min_field = make_field(min_field, Field, widget=widgets.TextWidget(''), name='min')
-        max_field = make_field(max_field, Field, widget=widgets.TextWidget(''), name='max')
-        unit_field = make_field(unit_field, ChoiceField, name='unit')
+        widget = make_widget(widget, BetweenWidget)
+        FormField.__init__(self, widget, [], name=name)
+        self.lazy_prototypes = OrderedDict([
+            ('min', min_field),
+            ('max', max_field),
+            ('unit', unit_field),
+        ])
+        self.shared = shared
 
-        prototypes = list(filter(None, [min_field, max_field, unit_field]))
-        self.command = 'between'
 
-        FormField.__init__(self, widget, prototypes=prototypes, converters=converters, validators=validators, name=name)
+    def bind(self, master, index=None):
+        FormField.bind(self, master, index)
+        min_field = make_field(
+            field = self.lazy_prototypes['min'],
+            field_class = Field,
+            widget = TextWidget(''),
+            name = 'min',
+            **self.shared
+        )
+        max_field = make_field(
+            field = self.lazy_prototypes['max'],
+            field_class = Field,
+            widget = TextWidget(''),
+            name = 'max',
+            **self.shared
+        )
+        unit_field = make_field(
+            field = self.lazy_prototypes['unit'],
+            field_class = ChoiceField,
+            choices = [],
+            name = 'unit',
+        )
+        prototypes = list(filter(None,
+            [min_field, max_field, unit_field]
+        ))
+        self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
+        return self
 
 
 class FilterTextField(FormField):
-    commands = (_('starts_with'), _('contains'), _('equals'), _('not_equals'), _('empty'))
+    commands = ('starts_with', 'contains', 'equals', 'not_equals', 'empty')
 
 
     def __init__(self,
         widget,
-        command_field = ...,
-        starts_with_field = ...,
-        contains_field = ...,
-        equals_field = ...,
-        not_equals_field = ...,
-        empty_field = ...,
+        command_field = None,
+        starts_with_field = None,
+        contains_field = None,
+        equals_field = None,
+        not_equals_field = None,
+        empty_field = None,
+        shared = dict(converters=[StrConverter()]),
         name = None
     ):
-        self._widget = widget
-        self._command_field = command_field
-        self._starts_with_field = starts_with_field
-        self._contains_field = contains_field
-        self._equals_field = equals_field
-        self._not_equals_field = not_equals_field
-        self._empty_field = empty_field
+        widget = make_widget(widget, FilterTextWidget)
         FormField.__init__(self, widget, [], name=name)
+        self.lazy_prototypes = OrderedDict([
+            ('command', command_field),
+            ('starts_with', starts_with_field),
+            ('contains', contains_field),
+            ('equals', equals_field),
+            ('not_equals', not_equals_field),
+            ('empty', empty_field),
+        ])
+        self.shared = shared
 
 
     def bind(self, master, index=None):
-        """
-        This duplicated overcomplicated shit will disappear only after
-        changing CLONE style to CLASS-FACTORY style...
-        """
         FormField.bind(self, master, index)
-        self.widget = widgets.make_widget(self._widget, widgets.FilterTextWidget)
         command_field = make_field(
-            field = self._command_field,
+            field = self.lazy_prototypes['command'],
             field_class = ChoiceField,
-            widget = widgets.SelectWidget('', list(map(self.translations.gettext, self.commands))),
+            widget = SelectWidget('', list(map(self.translations.gettext, self.commands))),
             choices = self.commands,
             default = 'contains',
-            name = 'command'
+            name = 'command',
         )
         starts_with_field = make_field(
-            field = self._starts_with_field,
+            field = self.lazy_prototypes['starts_with'],
             field_class = Field,
-            widget = widgets.TextWidget(''),
+            widget = TextWidget(''),
             name = 'starts_with',
+            **self.shared
         )
         contains_field = make_field(
-            field = self._contains_field,
+            field = self.lazy_prototypes['contains'],
             field_class = Field,
-            widget = widgets.TextWidget(''),
+            widget = TextWidget(''),
             name = 'contains',
+            **self.shared
         )
         equals_field = make_field(
-            field = self._equals_field,
+            field = self.lazy_prototypes['equals'],
             field_class = Field,
-            widget = widgets.TextWidget(''),
+            widget = TextWidget(''),
             name = 'equals',
+            **self.shared
         )
         not_equals_field = make_field(
-            field = self._not_equals_field,
+            field = self.lazy_prototypes['not_equals'],
             field_class = Field,
-            widget = widgets.TextWidget(''),
+            widget = TextWidget(''),
             name = 'not_equals',
+            **self.shared
         )
         empty_field = make_field(
-            field = self._empty_field,
+            field = self.lazy_prototypes['empty'],
             field_class = ChoiceField,
-            widget = widgets.SelectWidget(''),
+            widget = SelectWidget(''),
             choices = ['*', 'yes', 'no'],
             default = '*',
             name = 'empty',
         )
-        prototypes = list(
-            filter(
-                None, [command_field, starts_with_field, contains_field, equals_field, not_equals_field, empty_field]
-            )
-        )
+        prototypes = list(filter(None,
+            [command_field, starts_with_field, contains_field, equals_field, not_equals_field, empty_field]
+        ))
         self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
         return self
 
 
 class FilterRangeField(FormField):
-    commands = (_('equals'), _('not equals'), _('between'), _('empty'))
+    commands = ('equals', 'not_equals', 'between', 'empty')
 
 
     def __init__(self,
         widget,
-        converters,
-        command_field = ...,
-        equals_field = ...,
-        not_equals_field = ...,
-        between_field = ...,
-        empty_field = ...,
-        name = None
+        command_field = None,
+        equals_field = None,
+        not_equals_field = None,
+        between_field = None,
+        empty_field = None,
+        shared = {},
+        name = None,
     ):
-        self._widget = widget
-        self._command_field = command_field
-        self._equals_field = equals_field
-        self._not_equals_field = not_equals_field
-        self._between_field = between_field
-        self._empty_field = empty_field
-        self.converters = converters
+        widget = make_widget(widget, FilterTextWidget)
         FormField.__init__(self, widget, [], name=name)
+        self.lazy_prototypes = OrderedDict([
+            ('command', command_field),
+            ('equals', equals_field),
+            ('not_equals', not_equals_field),
+            ('between', between_field),
+            ('empty', empty_field),
+        ])
+        self.shared = shared
 
 
     def bind(self, master, index=None):
-        """
-        This duplicated overcomplicated shit will disappear only after
-        changing CLONE style to CLASS-FACTORY style...
-        """
         FormField.bind(self, master, index)
-        self.widget = widgets.make_widget(self._widget, widgets.FilterTextWidget)
         command_field = make_field(
-            field = self._command_field,
+            field = self.lazy_prototypes['command'],
             field_class = ChoiceField,
-            widget = widgets.SelectWidget('', list(map(self.translations.gettext, self.commands))),
+            widget = SelectWidget('', list(map(self.translations.gettext, self.commands))),
             choices = self.commands,
             default = 'equals',
             name = 'command'
         )
         equals_field = make_field(
-            field = self._equals_field,
+            field = self.lazy_prototypes['equals'],
             field_class = Field,
-            widget = widgets.TextWidget(''),
-            converters = self.converters,
+            widget = TextWidget(''),
             name = 'equals',
+            **self.shared
         )
         not_equals_field = make_field(
-            field = self._not_equals_field,
+            field = self.lazy_prototypes['not_equals'],
             field_class = Field,
-            widget = widgets.TextWidget(''),
-            converters = self.converters,
+            widget = TextWidget(''),
             name = 'not_equals',
+            **self.shared
         )
         between_field = make_field(
-            field = self._between_field,
+            field = self.lazy_prototypes['between'],
             field_class = BetweenField,
-            widget = widgets.TextWidget(''),
-            converters = self.converters,
+            widget = TextWidget(''),
             name = 'between',
+            **self.shared
         )
         empty_field = make_field(
-            field = self._empty_field,
+            field = self.lazy_prototypes['empty'],
             field_class = ChoiceField,
-            widget = widgets.SelectWidget(''),
+            widget = SelectWidget(''),
             choices = ['*', 'yes', 'no'],
             default = '*',
             name = 'empty',
         )
-        prototypes = list(
-            filter(
-                None, [command_field, equals_field, not_equals_field, between_field, empty_field]
-            )
-        )
+        prototypes = list(filter(None,
+            [command_field, equals_field, not_equals_field, between_field, empty_field]
+        ))
         self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
         return self
 
 
 # SHORTCUTS ====================================================================
 def TextField(widget, default=None, required=False, converters=StrConverter(), validators=LengthValidator(max=255), name=None):
-    widget = widgets.make_widget(widget, widgets.TextWidget)
+    widget = make_widget(widget, TextWidget)
     return Field(widget, default, required, converters, validators, name=name)
 
 
 def CheckField(widget, default=None, required=False, validators=[], name=None):
-    widget = widgets.make_widget(widget, widgets.CheckboxWidget)
+    widget = make_widget(widget, CheckboxWidget)
     return Field(widget, default, required, converters=BoolConverter(none=False), validators=validators, name=name)
 
 
 def DateField(widget, default=None, required=False, validators=[], name=None):
-    widget = widgets.make_widget(widget, widgets.DateWidget)
+    widget = make_widget(widget, DateWidget)
     return Field(widget, converters=DateConverter(), default=default, required=required, validators=validators, name=name)
 
 
 def DateTimeField(widget, default=None, required=False, validators=[], name=None):
-    widget = widgets.make_widget(widget, widgets.DateTimeWidget)
+    widget = make_widget(widget, DateTimeWidget)
     return Field(widget, converters=DateTimeConverter(), default=default, required=required, validators=validators, name=name)
 
 
 def BetweenDateField(widget):
     return BetweenField(
         widget = widget,
-        min_field = Field(widgets.TextWidget('', attrs={'data-role': 'datepicker'}), converters=DateConverter()),
-        max_field = Field(widgets.TextWidget('', attrs={'data-role': 'datepicker'}), converters=DateConverter()),
+        min_field = Field(TextWidget('', attrs={'data-role': 'datepicker'})),
+        max_field = Field(TextWidget('', attrs={'data-role': 'datepicker'})),
+        shared = dict(converters=[DateConverter()])
     )
 
 
 def BetweenDateTimeField(widget):
     return BetweenField(
         widget = widget,
-        min_field = Field(widgets.TextWidget('', attrs={'data-role': 'datetimepicker'}), converters=DateTimeConverter()),
-        max_field = Field(widgets.TextWidget('', attrs={'data-role': 'datetimepicker'}), converters=DateTimeConverter()),
+        min_field = Field(TextWidget('', attrs={'data-role': 'datetimepicker'}), converters=DateTimeConverter()),
+        max_field = Field(TextWidget('', attrs={'data-role': 'datetimepicker'}), converters=DateTimeConverter()),
     )
 
 
