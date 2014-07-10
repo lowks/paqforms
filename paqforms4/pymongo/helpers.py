@@ -1,6 +1,9 @@
 from decimal import Decimal
-from functools import singledispatch
 from datetime import datetime, timedelta
+try:
+    from functools import singledispatch
+except ImportError:
+    from singledispatch import singledispatch
 
 from ..converters import *
 
