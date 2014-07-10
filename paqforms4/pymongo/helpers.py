@@ -155,9 +155,6 @@ def get_filters(filterform, tz=None):
             # crappy logic before PaqForms5
             if len(field.shared.get('converters', [])) == 1:
                 value_to_query(field.shared.get('converters')[0], 'between', name, field.value, filters)
-        elif isinstance(field.value, (str, bool, int, float, Decimal)):
-            if len(field.converters) == 1:
-                value_to_query(field.converters[0], 'equals', name, field.value, filters)
     return filters
 
 
