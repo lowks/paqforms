@@ -687,7 +687,7 @@ class BetweenField(FormField):
         widget,
         min_field,
         max_field,
-        unit_field = None,
+        unit_field = False,
         shared = {},
         name = None,
     ):
@@ -825,7 +825,7 @@ class FilterRangeField(FormField):
         shared = {},
         name = None,
     ):
-        widget = make_widget(widget, FilterTextWidget)
+        widget = make_widget(widget, FilterRangeWidget)
         FormField.__init__(self, widget, [], name=name)
         self.lazy_prototypes = OrderedDict([
             ('command', command_field),
@@ -922,11 +922,23 @@ def BetweenDateTimeField(widget):
 
 
 def FilterDateField(widget):
-    return FilterRangeField(widget, DateConverter(), between_field=BetweenDateField(''))
+    return FilterRangeField(
+        widget,
+        equals_field = DateField(''),
+        not_equals_field = DateField(''),
+        between_field = BetweenDateField(''),
+        shared = dict(converters=[DateConverter()]),
+    )
 
 
 def FilterDateTimeField(widget):
-    return FilterRangeField(widget, DateTimeConverter(), between_field=BetweenDateField(''))
+    return FilterRangeField(
+        widget,
+        equals_field = DateTimeField(''),
+        not_equals_field = DateTimeField(''),
+        between_field = BetweenDateTimeField(''),
+        shared = dict(converters=[DateTimeConverter()]),
+    )
 
 
 __all__ = (

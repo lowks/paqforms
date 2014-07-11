@@ -7,8 +7,7 @@
         {{ field.fields['command'](attrs=attrs) }}
         {{ field.fields['equals'](attrs={'group-class': 'hidden'}) }}
         {{ field.fields['not_equals'](attrs={'group-class': 'hidden'}) }}
-        {{ field.fields['between'].fields['min'](prepend=_('from'), attrs={'class': 'input-mini', 'group-class': 'hidden'}) }}
-        {{ field.fields['between'].fields['max'](prepend=_('to'), attrs={'class': 'input-mini', 'group-class': 'hidden'}) }}
+        {{ field.fields['between'](attrs={'group-class': 'hidden'}) }}
         {{ field.fields['empty'](attrs={'group-class': 'hidden'}) }}
     </div></div>
 {% endcall %}
