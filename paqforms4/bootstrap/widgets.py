@@ -123,7 +123,7 @@ class FormWidget(Widget):
 
     def __call__(self, form, attrs={}, **context):
         attrs = Attrs(self.attrs, attrs)
-        return Markup('\n'.join(field(**attrs) for field in form.fields.values() if getattr(field, 'autorender', True)))
+        return Markup('\n'.join(field(attrs=attrs, **context) for field in form.fields.values() if getattr(field, 'autorender', True)))
 
 
 class HiddenWidget(Widget):
