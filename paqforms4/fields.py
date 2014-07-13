@@ -863,7 +863,7 @@ class FilterRangeField(FormField):
         between_field = make_field(
             field = self.lazy_prototypes['between'],
             field_class = BetweenField,
-            widget = TextWidget(''),
+            widget = BetweenWidget(''),
             name = 'between',
             **self.shared
         )
