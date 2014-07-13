@@ -16,8 +16,7 @@ def make_widget(widget, widget_class, **kwargs):
             widget = widget_class(widget.pop('caption', ''), **dict(kwargs, **widget))
         else:
             for key, value in kwargs.items():
-                if getattr(widget, key, None) is None:
-                    setattr(widget, key, value)
+                setattr(widget, key, value)
     return widget
 
 

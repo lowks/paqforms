@@ -103,8 +103,7 @@ def make_field(field, field_class, **kwargs):
             field = field_class(widget, **kwargs)
         else:
             for key, value in kwargs.items():
-                if getattr(field, key, None) is None:
-                    setattr(field, key, value)
+                setattr(field, key, value)
     return field
 
 
@@ -904,12 +903,13 @@ def DateTimeField(widget, default=None, required=False, validators=[], name=None
     return Field(widget, converters=DateTimeConverter(), default=default, required=required, validators=validators, name=name)
 
 
-def BetweenDateField(widget):
+def BetweenDateField(widget, name=None):
     return BetweenField(
         widget = widget,
         min_field = Field(TextWidget('', attrs={'data-role': 'datepicker'})),
         max_field = Field(TextWidget('', attrs={'data-role': 'datepicker'})),
-        shared = dict(converters=[DateConverter()])
+        shared = dict(converters=[DateConverter()]),
+        name = name
     )
 
 
