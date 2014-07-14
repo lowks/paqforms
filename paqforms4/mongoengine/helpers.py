@@ -69,7 +69,7 @@ def _(model_class, command, name, value, filters):
 
 
 @value_to_query.register(DateTimeField)
-def _(model_class, name, command, value, filters):
+def _(model_class, command, name, value, filters):
     def equals(name, value, filters):
         if value:
             samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
@@ -104,13 +104,13 @@ def _(model_class, name, command, value, filters):
 def get_filters(filterform, model_class, tz=None):
     filters = {}
     for name, field in filterform:
-        if 'command' in field.prototypes:
-            command = field.value['command']
-            if command:
-                value = field.value[command]
-                value_to_query(model_class._fields[name], command, name, value, filters)
-        elif 'min' in field.prototypes and 'max' in field.prototypes:
-            value_to_query(model_class(), 'between', name, field.value, filters)
+        if hasattr(field, 'prototypes'):
+            if 'command' in field.prototypes:
+                command = field.value['command']
+                if command:
+                    value_to_query(model_class._fields[name], command, name, field.value[command], filters)
+            elif 'min' in field.prototypes and 'max' in field.prototypes:
+                value_to_query(model_class(), 'between', name, field.value, filters)
     return filters
 
 

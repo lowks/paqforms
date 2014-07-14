@@ -728,7 +728,6 @@ def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
 
 
 def BetweenDateField(widget, name=None):
-    unit_field.name = 'unit'
     return FormField(
         widget = widget,
         prototypes = [
