@@ -93,20 +93,6 @@ class DeclarativeMeta(OrderedClass):
 
 
 # FIELDS =======================================================================
-def make_field(field, field_class, **kwargs):
-    if field is not False:
-        if isinstance(field, dict):
-            widget = kwargs.pop('widget', '') or field.pop('widget', '')
-            field = field_class(widget, **dict(kwargs, **field))
-        elif field is None:
-            widget = kwargs.pop('widget', '')
-            field = field_class(widget, **kwargs)
-        else:
-            for key, value in kwargs.items():
-                setattr(field, key, value)
-    return field
-
-
 class Prototype(metaclass=OrderedClass):
     def __init__(self, name):
         self.name = name
@@ -394,9 +380,9 @@ class FormField(Prototype, metaclass=OrderedClass):
         if hasattr(prototypes, 'prototypes'):
             self.prototypes = prototypes.prototypes
         elif isinstance(prototypes, Sequence):
-            self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
+            self.prototypes = OrderedDict([(p.name, p) for p in prototypes if p])
         else:
-            self.prototypes = prototypes
+            self.prototypes = OrderedDict([(name, p) for name, p in prototypes.items() if p])
         self.default = default
 
         try:
@@ -681,207 +667,6 @@ class MultiChoiceField(Field):
         return self
 
 
-class BetweenField(FormField):
-    def __init__(self,
-        widget,
-        min_field,
-        max_field,
-        unit_field = False,
-        shared = {},
-        name = None,
-    ):
-        widget = make_widget(widget, BetweenWidget)
-        FormField.__init__(self, widget, [], name=name)
-        self.lazy_prototypes = OrderedDict([
-            ('min', min_field),
-            ('max', max_field),
-            ('unit', unit_field),
-        ])
-        self.shared = shared
-
-
-    def bind(self, master, index=None):
-        FormField.bind(self, master, index)
-        min_field = make_field(
-            field = self.lazy_prototypes['min'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'min',
-            **self.shared
-        )
-        max_field = make_field(
-            field = self.lazy_prototypes['max'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'max',
-            **self.shared
-        )
-        unit_field = make_field(
-            field = self.lazy_prototypes['unit'],
-            field_class = ChoiceField,
-            choices = [],
-            name = 'unit',
-        )
-        prototypes = list(filter(None,
-            [min_field, max_field, unit_field]
-        ))
-        self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
-        return self
-
-
-class FilterTextField(FormField):
-    commands = ('starts_with', 'contains', 'equals', 'not_equals', 'empty')
-
-
-    def __init__(self,
-        widget,
-        command_field = None,
-        starts_with_field = None,
-        contains_field = None,
-        equals_field = None,
-        not_equals_field = None,
-        empty_field = None,
-        shared = dict(converters=[StrConverter()]),
-        name = None
-    ):
-        widget = make_widget(widget, FilterTextWidget)
-        FormField.__init__(self, widget, [], name=name)
-        self.lazy_prototypes = OrderedDict([
-            ('command', command_field),
-            ('starts_with', starts_with_field),
-            ('contains', contains_field),
-            ('equals', equals_field),
-            ('not_equals', not_equals_field),
-            ('empty', empty_field),
-        ])
-        self.shared = shared
-
-
-    def bind(self, master, index=None):
-        FormField.bind(self, master, index)
-        command_field = make_field(
-            field = self.lazy_prototypes['command'],
-            field_class = ChoiceField,
-            widget = SelectWidget('', list(map(self.translations.gettext, self.commands))),
-            choices = self.commands,
-            default = 'contains',
-            name = 'command',
-        )
-        starts_with_field = make_field(
-            field = self.lazy_prototypes['starts_with'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'starts_with',
-            **self.shared
-        )
-        contains_field = make_field(
-            field = self.lazy_prototypes['contains'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'contains',
-            **self.shared
-        )
-        equals_field = make_field(
-            field = self.lazy_prototypes['equals'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'equals',
-            **self.shared
-        )
-        not_equals_field = make_field(
-            field = self.lazy_prototypes['not_equals'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'not_equals',
-            **self.shared
-        )
-        empty_field = make_field(
-            field = self.lazy_prototypes['empty'],
-            field_class = ChoiceField,
-            widget = SelectWidget(''),
-            choices = ['*', 'yes', 'no'],
-            default = '*',
-            name = 'empty',
-        )
-        prototypes = list(filter(None,
-            [command_field, starts_with_field, contains_field, equals_field, not_equals_field, empty_field]
-        ))
-        self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
-        return self
-
-
-class FilterRangeField(FormField):
-    commands = ('equals', 'not_equals', 'between', 'empty')
-
-
-    def __init__(self,
-        widget,
-        command_field = None,
-        equals_field = None,
-        not_equals_field = None,
-        between_field = None,
-        empty_field = None,
-        shared = {},
-        name = None,
-    ):
-        widget = make_widget(widget, FilterRangeWidget)
-        FormField.__init__(self, widget, [], name=name)
-        self.lazy_prototypes = OrderedDict([
-            ('command', command_field),
-            ('equals', equals_field),
-            ('not_equals', not_equals_field),
-            ('between', between_field),
-            ('empty', empty_field),
-        ])
-        self.shared = shared
-
-
-    def bind(self, master, index=None):
-        FormField.bind(self, master, index)
-        command_field = make_field(
-            field = self.lazy_prototypes['command'],
-            field_class = ChoiceField,
-            widget = SelectWidget('', list(map(self.translations.gettext, self.commands))),
-            choices = self.commands,
-            default = 'equals',
-            name = 'command'
-        )
-        equals_field = make_field(
-            field = self.lazy_prototypes['equals'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'equals',
-            **self.shared
-        )
-        not_equals_field = make_field(
-            field = self.lazy_prototypes['not_equals'],
-            field_class = Field,
-            widget = TextWidget(''),
-            name = 'not_equals',
-            **self.shared
-        )
-        between_field = make_field(
-            field = self.lazy_prototypes['between'],
-            field_class = BetweenField,
-            widget = BetweenWidget(''),
-            name = 'between',
-            **self.shared
-        )
-        empty_field = make_field(
-            field = self.lazy_prototypes['empty'],
-            field_class = ChoiceField,
-            widget = SelectWidget(''),
-            choices = ['*', 'yes', 'no'],
-            default = '*',
-            name = 'empty',
-        )
-        prototypes = list(filter(None,
-            [command_field, equals_field, not_equals_field, between_field, empty_field]
-        ))
-        self.prototypes = OrderedDict([(prototype.name, prototype) for prototype in prototypes])
-        return self
-
-
 # SHORTCUTS ====================================================================
 def TextField(widget, default=None, required=False, converters=StrConverter(), validators=LengthValidator(max=255), name=None):
     widget = make_widget(widget, TextWidget)
@@ -903,47 +688,184 @@ def DateTimeField(widget, default=None, required=False, validators=[], name=None
     return Field(widget, converters=DateTimeConverter(), default=default, required=required, validators=validators, name=name)
 
 
-def BetweenDateField(widget, name=None):
-    return BetweenField(
+def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
+    unit_field.name = 'unit'
+    return FormField(
         widget = widget,
-        min_field = Field(TextWidget('', attrs={'data-role': 'datepicker'})),
-        max_field = Field(TextWidget('', attrs={'data-role': 'datepicker'})),
-        shared = dict(converters=[DateConverter()]),
+        prototypes = [
+            Field('', [IntConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
+            Field('', [IntConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
+            unit_field
+        ],
         name = name
     )
 
 
-def BetweenDateTimeField(widget):
-    return BetweenField(
+def BetweenFloatField(widget, min=0.0, max=None, unit_field=None, name=None):
+    unit_field.name = 'unit'
+    return FormField(
         widget = widget,
-        min_field = Field(TextWidget('', attrs={'data-role': 'datetimepicker'}), converters=DateTimeConverter()),
-        max_field = Field(TextWidget('', attrs={'data-role': 'datetimepicker'}), converters=DateTimeConverter()),
+        prototypes = [
+            Field('', [FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
+            Field('', [FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
+            unit_field
+        ],
+        name = name
     )
 
 
-def FilterDateField(widget):
-    return FilterRangeField(
-        widget,
-        equals_field = DateField(''),
-        not_equals_field = DateField(''),
-        between_field = BetweenDateField(''),
-        shared = dict(converters=[DateConverter()]),
+def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
+    unit_field.name = 'unit'
+    return FormField(
+        widget = widget,
+        prototypes = [
+            Field('', [DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
+            Field('', [DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
+            unit_field
+        ],
+        name = name
     )
 
 
-def FilterDateTimeField(widget):
-    return FilterRangeField(
-        widget,
-        equals_field = DateTimeField(''),
-        not_equals_field = DateTimeField(''),
-        between_field = BetweenDateTimeField(''),
-        shared = dict(converters=[DateTimeConverter()]),
+def BetweenDateField(widget, name=None):
+    unit_field.name = 'unit'
+    return FormField(
+        widget = widget,
+        prototypes = [
+            DateField('', name='min'),
+            DateField('', name='max'),
+        ],
+        name = name
+    )
+
+
+def BetweenDateTimeField(widget, name=None):
+    return FormField(
+        widget = widget,
+        prototypes = [
+            DateTimeField('', name='min'),
+            DateTimeField('', name='max'),
+        ],
+        name = name
+    )
+
+
+def FilterTextField(caption, name=None):
+    return FormField(
+        widget = FilterTextWidget(caption),
+        prototypes = [
+            ChoiceField(
+                widget = SelectWidget(''),
+                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                default = 'starts_with',
+                name = 'command'
+            ),
+            Field(TextWidget(''), converters=[StrConverter()], name='starts_with'),
+            Field(TextWidget(''), converters=[StrConverter()], name='contains'),
+            Field(TextWidget(''), converters=[StrConverter()], name='equals'),
+            Field(TextWidget(''), converters=[StrConverter()], name='not_equals'),
+            ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
+        ],
+        name = name
+    )
+
+
+def FilterIntField(caption, name=None):
+    return FormField(
+        widget = FilterRangeWidget(caption),
+        prototypes = [
+            ChoiceField(
+                widget = SelectWidget('', self.commands),
+                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                default = 'equals',
+                name = 'command'
+            ),
+            Field(TextWidget(''), converters=[IntConverter()], name='equals'),
+            Field(TextWidget(''), converters=[IntConverter()], name='not_equals'),
+            BetweenIntField('', name='between'),
+            ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
+        ],
+        name = name
+    )
+
+
+def FilterFloatField(caption, name=None):
+    return FormField(
+        widget = FilterRangeWidget(caption),
+        prototypes = [
+            ChoiceField(
+                widget = SelectWidget('', self.commands),
+                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                default = 'equals',
+                name = 'command'
+            ),
+            Field(TextWidget(''), converters=[FloatConverter()], name='equals'),
+            Field(TextWidget(''), converters=[FloatConverter()], name='not_equals'),
+            BetweenFloatField('', name='between'),
+            ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
+        ],
+        name = name
+    )
+
+
+def FilterDecimalField(caption, name=None):
+    return FormField(
+        widget = FilterRangeWidget(caption),
+        prototypes = [
+            ChoiceField(
+                widget = SelectWidget('', self.commands),
+                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                default = 'equals',
+                name = 'command'
+            ),
+            Field(TextWidget(''), converters=[DecimalConverter()], name='equals'),
+            Field(TextWidget(''), converters=[DecimalConverter()], name='not_equals'),
+            BetweenDecimalField('', name='between'),
+            ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
+        ],
+        name = name
+    )
+
+
+def FilterDateField(caption, name=None):
+    return FormField(
+        widget = FilterRangeWidget(caption),
+        prototypes = [
+            ChoiceField(
+                widget = SelectWidget(''),
+                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                default = 'equals',
+                name = 'command'
+            ),
+            DateField('', name='equals'),
+            DateField('', name='not_equals'),
+            BetweenDateField('', name='between'),
+            ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
+        ],
+        name = name
+    )
+
+
+def FilterDateTimeField(widget, name=None):
+    return FormField(
+        widget = FilterRangeWidget(caption),
+        prototypes = [
+            ChoiceField(
+                widget = SelectWidget(''),
+                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                default = 'equals',
+                name = 'command'
+            ),
+            DateTimeField('', name='equals'),
+            DateTimeField('', name='not_equals'),
+            BetweenDateTimeField('', name='between'),
+            ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
+        ],
+        name = name
     )
 
 
 __all__ = (
-    'make_field',
-
     # FIELDS
     'Field',
     'FieldField',
@@ -951,17 +873,19 @@ __all__ = (
     'BaseForm',
     'ChoiceField',
     'MultiChoiceField',
-    'BetweenField',
-    'FilterTextField',
-    'FilterRangeField',
-
-    # SHORTCUTS
     'TextField',
     'CheckField',
     'DateField',
     'DateTimeField',
+    'BetweenIntField',
+    'BetweenFloatField',
+    'BetweenDecimalField',
     'BetweenDateField',
     'BetweenDateTimeField',
+    'FilterTextField',
+    'FilterIntField',
+    'FilterFloatField',
+    'FilterDecimalField',
     'FilterDateField',
-    'FilterDateTimeField'
+    'FilterDateTimeField',
 )

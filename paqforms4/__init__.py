@@ -26,11 +26,9 @@ __all__ = (
     # FIELDS
     'Field', 'FieldField', 'FormField', 'BaseForm',
     'ChoiceField', 'MultiChoiceField',
-
-    # FIELDS / SHORTCUTS
     'TextField', 'CheckField', 'DateField', 'DateTimeField',
-    'BetweenField', 'BetweenDateField', 'BetweenDateTimeField',
-    'FilterTextField', 'FilterRangeField', 'FilterDateField', 'FilterDateTimeField',
+    'BetweenIntField', 'BetweenFloatField', 'BetweenDecimalField', 'BetweenDateField', 'BetweenDateTimeField',
+    'FilterTextField', 'FilterIntField', 'FilterFloatField', 'FilterDecimalField', 'FilterDateField', 'FilterDateTimeField',
 
     # WIDGETS
     'TextWidget',
