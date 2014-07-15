@@ -10,12 +10,12 @@ from ..converters import *
 
 
 @singledispatch
-def value_to_query(model_class, command, name, value, filters):
+def value_to_query(model_field, form_field, command, name, value, filters, tz):
     pass # Do nothing (keep filters as is)
 
 
 @value_to_query.register(StringField)
-def _(model_class, command, name, value, filters):
+def _(model_field, form_field, command, name, value, filters, tz):
     def contains(name, value, filters):
         if value:
             filters[name] = {'$regex': value, '$options': '-i'} # TODO -i breaks index support
@@ -42,7 +42,7 @@ def _(model_class, command, name, value, filters):
 @value_to_query.register(IntField)
 @value_to_query.register(FloatField)
 @value_to_query.register(DecimalField)
-def _(model_class, command, name, value, filters):
+def _(model_field, form_field, command, name, value, filters, tz):
     def equals(name, value, filters):
         filters[name] = value
 
@@ -69,48 +69,96 @@ def _(model_class, command, name, value, filters):
 
 
 @value_to_query.register(DateTimeField)
-def _(model_class, command, name, value, filters):
-    def equals(name, value, filters):
-        if value:
-            samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
-            nextsec = samesec + timedelta(seconds=1)
-            filters[name] = {'$gte': samesec, '$lt': nextsec}
+def _(model_field, form_field, command, name, value, filters, tz):
+    converter = form_field.meta.get('converter')
+    if isinstance(converter, DateTimeConverter): # check intention
+        # Treat datetime as datetime
+        def equals(name, value, filters):
+            if value:
+                samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
+                nextsec = samesec + timedelta(seconds=1)
+                filters[name] = {'$gte': samesec, '$lt': nextsec}
 
-    def not_equals(name, value, filters):
-        if value:
-            samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
-            nextsec = samesec + timedelta(seconds=1)
-            filters.setdefault('$or', []).extend(
-                [{name: {'$lt': samesec}}, {name: {'$gte': nextsec}}]
-            )
+        def not_equals(name, value, filters):
+            if value:
+                samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
+                nextsec = samesec + timedelta(seconds=1)
+                filters.setdefault('$or', []).extend(
+                    [{name: {'$lt': samesec}}, {name: {'$gte': nextsec}}]
+                )
 
-    def empty(name, value, filters):
-        if value == 'yes':
-            filters[name] = None
-        elif value == 'no':
-            filters[name] = {'$ne': None}
+        def empty(name, value, filters):
+            if value == 'yes':
+                filters[name] = None
+            elif value == 'no':
+                filters[name] = {'$ne': None}
 
-    def between(name, value, filters):
-        if value['min'] and value['max']:
-            filters[name] = {'$gte': value['min'], '$lte': value['max']}
-        elif value['min']:
-            filters[name] = {'$gte': value['min']}
-        elif value['max']:
-            filters[name] = {'$lte': value['max']}
+        def between(name, value, filters):
+            if value['min'] and value['max']:
+                filters[name] = {'$gte': value['min'], '$lte': value['max']}
+            elif value['min']:
+                filters[name] = {'$gte': value['min']}
+            elif value['max']:
+                filters[name] = {'$lte': value['max']}
+    else:
+        # Treat datetime as date
+        print('AS DATE')
+        def equals(name, value, filters):
+            if value:
+                sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
+                nextday = sameday + timedelta(hours=24)
+                filters[name] =  {'$gte': sameday, '$lt': nextday}
+
+        def not_equals(name, value, filters):
+            if value:
+                sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
+                nextday = sameday + timedelta(hours=24)
+                filters.setdefault('$or', []).extend(
+                    [{name: {'$lt': sameday}}, {name: {'$gte': nextday}}]
+                )
+
+        def between(name, value, filters):
+            if value['min'] and value['max']:
+                minday = datetime(value['min'].year, value['min'].month, value['min'].day, tzinfo=tz)
+                maxday = datetime(value['max'].year, value['max'].month, value['max'].day, tzinfo=tz)
+                maxday = maxday + timedelta(days=1)
+                filters[name] = {'$gte': minday, '$lt': maxday}
+            elif value['min']:
+                minday = datetime(value['min'].year, value['min'].month, value['min'].day, tzinfo=tz)
+                filters[name] = {'$gte': minday}
+            elif value['max']:
+                maxday = datetime(value['max'].year, value['max'].month, value['max'].day, tzinfo=tz)
+                maxday = maxday + timedelta(days=1)
+                filters[name] = {'$lt': maxday}
+
+        def empty(name, value, filters):
+            if value == 'yes':
+                filters[name] = None
+            elif value == 'no':
+                filters[name] = {'$ne': None}
+
+    print('>>>', filters)
 
     locals()[command](name, value, filters)
 
 
 def get_filters(filterform, model_class, tz=None):
     filters = {}
-    for name, field in filterform:
-        if hasattr(field, 'prototypes'):
-            if 'command' in field.prototypes:
-                command = field.value['command']
+    for name, form_field in filterform:
+        if hasattr(form_field, 'prototypes'):
+            if 'command' in form_field.prototypes:
+                command = form_field.value['command']
                 if command:
-                    value_to_query(model_class._fields[name], command, name, field.value[command], filters)
-            elif 'min' in field.prototypes and 'max' in field.prototypes:
-                value_to_query(model_class(), 'between', name, field.value, filters)
+                    value = form_field.value[command]
+            elif 'min' in form_field.prototypes and 'max' in form_field.prototypes:
+                command = 'between'
+                value = form_field.value
+            else:
+                command = None
+                value = None
+            if command:
+                model_field = model_class._fields[name]
+                value_to_query(model_field, form_field, command, name, value, filters, tz)
     return filters
 
 
@@ -129,44 +177,3 @@ def get_sorts(sortform):
             else:
                 raise TypeError('Invalid value type {!r} for field {!r}'.format(type(field.value), field))
     return sorts
-
-
-"""
-@value_to_query.register(DateField)
-def _(model_class, command, name, value, filters):
-    def equals(name, value, filters):
-        if value:
-            sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
-            nextday = sameday + timedelta(hours=24)
-            filters[name] =  {'$gte': sameday, '$lt': nextday}
-
-    def not_equals(name, value, filters):
-        if value:
-            sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
-            nextday = sameday + timedelta(hours=24)
-            filters.setdefault('$or', []).extend(
-                [{name: {'$lt': sameday}}, {name: {'$gte': nextday}}]
-            )
-
-    def between(name, value, filters):
-        if value['min'] and value['max']:
-            minday = datetime(value['min'].year, value['min'].month, value['min'].day, tzinfo=tz)
-            maxday = datetime(value['max'].year, value['max'].month, value['max'].day, tzinfo=tz)
-            maxday = maxday + timedelta(days=1)
-            filters[name] = {'$gte': minday, '$lt': maxday}
-        elif value['min']:
-            minday = datetime(value['min'].year, value['min'].month, value['min'].day, tzinfo=tz)
-            filters[name] = {'$gte': minday}
-        elif value['max']:
-            maxday = datetime(value['max'].year, value['max'].month, value['max'].day, tzinfo=tz)
-            maxday = maxday + timedelta(days=1)
-            filters[name] = {'$lt': maxday}
-
-    def empty(name, value, filters):
-        if value == 'yes':
-            filters[name] = None
-        elif value == 'no':
-            filters[name] = {'$ne': None}
-
-    locals()[command](name, value, filters)
-"""
