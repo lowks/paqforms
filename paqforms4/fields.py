@@ -689,7 +689,9 @@ def DateTimeField(widget, default=None, required=False, validators=[], name=None
 
 
 def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
-    unit_field.name = 'unit'
+    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    if unit_field:
+        unit_field.name = 'unit'
     return FormField(
         widget = widget,
         prototypes = [
@@ -702,7 +704,9 @@ def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
 
 
 def BetweenFloatField(widget, min=0.0, max=None, unit_field=None, name=None):
-    unit_field.name = 'unit'
+    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    if unit_field:
+        unit_field.name = 'unit'
     return FormField(
         widget = widget,
         prototypes = [
@@ -715,7 +719,9 @@ def BetweenFloatField(widget, min=0.0, max=None, unit_field=None, name=None):
 
 
 def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
-    unit_field.name = 'unit'
+    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    if unit_field:
+        unit_field.name = 'unit'
     return FormField(
         widget = widget,
         prototypes = [
@@ -728,6 +734,7 @@ def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
 
 
 def BetweenDateField(widget, name=None):
+    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
     return FormField(
         widget = widget,
         prototypes = [
@@ -739,6 +746,7 @@ def BetweenDateField(widget, name=None):
 
 
 def BetweenDateTimeField(widget, name=None):
+    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
     return FormField(
         widget = widget,
         prototypes = [
