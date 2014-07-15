@@ -46,9 +46,11 @@ class Widget:
         if self.template:
             template = self.template_env.get_template('widgets/' + self.template)
         else:
-            template = self.template_env.select_template(
-                ['widgets/{}.html'.format(cls.__name__) for cls in self.__class__.mro()[:-2]]
-            )
+            filenames = ['widgets/{}.html'.format(cls.__name__) for cls in self.__class__.mro()[:-2]]
+            if filenames:
+                template = self.template_env.select_template(filenames)
+            else:
+                raise Exception('Cannot render `Widget` class. Extend it or define `template` to use!')
 
         return Markup(
             template.render(
@@ -171,10 +173,6 @@ class MultiCheckboxWidget(Widget):
 
 
 # FILTER WIDGETS
-class BetweenWidget(Widget):
-    pass
-
-
 class FilterTextWidget(Widget):
     pass
 
@@ -199,7 +197,6 @@ __all__ = (
     'CheckboxWidget',
     'SelectWidget',
     'MultiCheckboxWidget',
-    'BetweenWidget',
     'FilterTextWidget',
     'FilterRangeWidget',
 )

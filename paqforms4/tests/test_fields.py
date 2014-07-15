@@ -144,7 +144,7 @@ class Test_Field:
         `data` overrides `value`
         """
         # valid
-        field = Field('', converters=IntConverter(), required=True)
+        field = Field(TextWidget(''), converters=IntConverter(), required=True)
         field.feed(value=11, data='12', submit=True)
         assert field.value == 12
         assert not field.messages.get('error')

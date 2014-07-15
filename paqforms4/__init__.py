@@ -33,7 +33,7 @@ __all__ = (
     # WIDGETS
     'TextWidget',
 
-    # 'Widget',
+    'Widget',
     'FieldFieldWidget',
     'FormFieldWidget',
     'FieldsetWidget',
@@ -48,7 +48,6 @@ __all__ = (
     'CheckboxWidget',
     'SelectWidget',
     'MultiCheckboxWidget',
-    'BetweenWidget',
     'FilterTextWidget',
     'FilterRangeWidget',
 )

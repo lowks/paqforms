@@ -112,7 +112,10 @@ class Prototype(metaclass=OrderedClass):
 
 
     def __call__(self, attrs={}, **context):
-        return self.widget(self, attrs, **context)
+        if callable(self.widget):
+            return self.widget(self, attrs, **context)
+        else:
+            raise Exception('`self.widget` of type {!r} is not callable in {}'.format(type(self.widget).__name__, self))
 
 
     def bind(self, master, index=None):
@@ -156,7 +159,7 @@ class Field(Prototype, metaclass=OrderedClass):
     autorender = True
 
     def __init__(self, widget, default=None, required=False, converters=[], validators=[], name=None):
-        self.widget = Widget(widget) if isinstance(widget, str) else widget
+        self.widget = widget
         self.default = default
         self.required = required
 
@@ -690,14 +693,14 @@ def DateTimeField(widget, default=None, required=False, validators=[], name=None
 
 
 def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
-    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     if unit_field:
         unit_field.name = 'unit'
     return FormField(
         widget = widget,
         prototypes = [
-            Field('', [IntConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
-            Field('', [IntConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
+            Field(TextWidget(''), converters=[IntConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
+            Field(TextWidget(''), converters=[IntConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
             unit_field
         ],
         name = name
@@ -705,14 +708,14 @@ def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
 
 
 def BetweenFloatField(widget, min=0.0, max=None, unit_field=None, name=None):
-    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     if unit_field:
         unit_field.name = 'unit'
     return FormField(
         widget = widget,
         prototypes = [
-            Field('', [FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
-            Field('', [FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
+            Field(TextWidget(''), converters=[FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
+            Field(TextWidget(''), converters=[FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
             unit_field
         ],
         name = name
@@ -720,14 +723,14 @@ def BetweenFloatField(widget, min=0.0, max=None, unit_field=None, name=None):
 
 
 def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
-    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     if unit_field:
         unit_field.name = 'unit'
     return FormField(
-        widget = widget,
+        widget,
         prototypes = [
-            Field('', [DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
-            Field('', [DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
+            Field(TextWidget(''), converters=[DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='min'),
+            Field(TextWidget(''), converters=[DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
             unit_field
         ],
         name = name
@@ -735,7 +738,7 @@ def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
 
 
 def BetweenDateField(widget, name=None):
-    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     return FormField(
         widget = widget,
         prototypes = [
@@ -747,7 +750,7 @@ def BetweenDateField(widget, name=None):
 
 
 def BetweenDateTimeField(widget, name=None):
-    widget = BetweenWidget(widget) if isinstance(widget, str) else widget
+    widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     return FormField(
         widget = widget,
         prototypes = [
