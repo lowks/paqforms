@@ -102,7 +102,6 @@ def _(model_field, form_field, command, name, value, filters, tz):
                 filters[name] = {'$lte': value['max']}
     else:
         # Treat datetime as date
-        print('AS DATE')
         def equals(name, value, filters):
             if value:
                 sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
@@ -136,8 +135,6 @@ def _(model_field, form_field, command, name, value, filters, tz):
                 filters[name] = None
             elif value == 'no':
                 filters[name] = {'$ne': None}
-
-    print('>>>', filters)
 
     locals()[command](name, value, filters)
 
