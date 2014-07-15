@@ -375,7 +375,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
 
 
 class FormField(Prototype, metaclass=OrderedClass):
-    def __init__(self, widget, prototypes, default={}, converters=[], validators=[], name=None):
+    def __init__(self, widget, prototypes, default={}, converters=[], validators=[], meta={}, name=None):
         self.widget = FormFieldWidget(widget) if isinstance(widget, str) else widget
         if hasattr(prototypes, 'prototypes'):
             self.prototypes = prototypes.prototypes
@@ -396,6 +396,7 @@ class FormField(Prototype, metaclass=OrderedClass):
 
         self.fields = OrderedDict()
         Prototype.__init__(self, name)
+        self.meta = meta.copy()
 
 
     def __iter__(self):
@@ -849,6 +850,7 @@ def FilterDateField(caption, name=None):
             BetweenDateField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
+        meta = {'converter': DateConverter()},
         name = name
     )
 
@@ -868,6 +870,7 @@ def FilterDateTimeField(widget, name=None):
             BetweenDateTimeField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
+        meta = {'converter': DateTimeConverter()},
         name = name
     )
 
