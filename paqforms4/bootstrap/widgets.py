@@ -7,19 +7,6 @@ from markupsafe import Markup
 from ..html import *
 
 
-# WIDGETS
-def make_widget(widget, widget_class, **kwargs):
-    if widget is not False:
-        if isinstance(widget, str):
-            widget = widget_class(widget, **kwargs)
-        elif isinstance(widget, dict):
-            widget = widget_class(widget.pop('caption', ''), **dict(kwargs, **widget))
-        else:
-            for key, value in kwargs.items():
-                setattr(widget, key, value)
-    return widget
-
-
 class Widget:
     template = None # Can be overriden # HACK - nearly unused...
     alerts_template = 'alerts-inline.html'
@@ -197,7 +184,6 @@ class FilterRangeWidget(Widget):
 
 
 __all__ = (
-    'make_widget',
     'Widget',
     'FieldFieldWidget',
     'FormFieldWidget',

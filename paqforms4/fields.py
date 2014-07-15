@@ -156,7 +156,7 @@ class Field(Prototype, metaclass=OrderedClass):
     autorender = True
 
     def __init__(self, widget, default=None, required=False, converters=[], validators=[], name=None):
-        self.widget = make_widget(widget, Widget)
+        self.widget = Widget(widget) if isinstance(widget, str) else widget
         self.default = default
         self.required = required
 
@@ -262,7 +262,7 @@ class Field(Prototype, metaclass=OrderedClass):
 
 class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (need to check length!)
     def __init__(self, widget, prototype, default=[], required=False, converters=[], validators=[], name=None):
-        self.widget = make_widget(widget, FieldFieldWidget)
+        self.widget = FieldFieldWidget(widget) if isinstance(widget, str) else widget
         if isinstance(prototype, Prototype):
             self.prototype = prototype
         else:
@@ -376,7 +376,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
 
 class FormField(Prototype, metaclass=OrderedClass):
     def __init__(self, widget, prototypes, default={}, converters=[], validators=[], name=None):
-        self.widget = make_widget(widget, FormFieldWidget)
+        self.widget = FormFieldWidget(widget) if isinstance(widget, str) else widget
         if hasattr(prototypes, 'prototypes'):
             self.prototypes = prototypes.prototypes
         elif isinstance(prototypes, Sequence):
@@ -584,7 +584,7 @@ class ChoiceField(Field):
         validators = [],
         name = None
     ):
-        widget = make_widget(widget, SelectWidget)
+        widget = SelectWidget(widget) if isinstance(widget, str) else widget
         self.choices = choices
         Field.__init__(self, widget, default, required, converters, validators, name)
 
@@ -625,7 +625,7 @@ class MultiChoiceField(Field):
         validators = [],
         name = None
     ):
-        widget = make_widget(widget, MultiCheckboxWidget)
+        widget = MultiCheckboxWidget(widget) if isinstance(widget, str) else widget
         self.choices = choices
         Field.__init__(self, widget, default, required, converters, validators, name)
 
@@ -669,22 +669,22 @@ class MultiChoiceField(Field):
 
 # SHORTCUTS ====================================================================
 def TextField(widget, default=None, required=False, converters=StrConverter(), validators=LengthValidator(max=255), name=None):
-    widget = make_widget(widget, TextWidget)
+    widget = TextWidget(widget) if isinstance(widget, str) else widget
     return Field(widget, default, required, converters, validators, name=name)
 
 
 def CheckField(widget, default=None, required=False, validators=[], name=None):
-    widget = make_widget(widget, CheckboxWidget)
+    widget = CheckboxWidget(widget) if isinstance(widget, str) else widget
     return Field(widget, default, required, converters=BoolConverter(none=False), validators=validators, name=name)
 
 
 def DateField(widget, default=None, required=False, validators=[], name=None):
-    widget = make_widget(widget, DateWidget)
+    widget = DateWidget(widget) if isinstance(widget, str) else widget
     return Field(widget, converters=DateConverter(), default=default, required=required, validators=validators, name=name)
 
 
 def DateTimeField(widget, default=None, required=False, validators=[], name=None):
-    widget = make_widget(widget, DateTimeWidget)
+    widget = DateTimeWidget(widget) if isinstance(widget, str) else widget
     return Field(widget, converters=DateTimeConverter(), default=default, required=required, validators=validators, name=name)
 
 

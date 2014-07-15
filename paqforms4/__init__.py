@@ -33,7 +33,6 @@ __all__ = (
     # WIDGETS
     'TextWidget',
 
-    # 'make_widget',
     # 'Widget',
     'FieldFieldWidget',
     'FormFieldWidget',
