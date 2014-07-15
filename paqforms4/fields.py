@@ -774,8 +774,8 @@ def FilterIntField(caption, name=None):
         widget = FilterRangeWidget(caption),
         prototypes = [
             ChoiceField(
-                widget = SelectWidget('', self.commands),
-                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                widget = SelectWidget(''),
+                choices = ('equals', 'not_equals', 'between', 'empty'),
                 default = 'equals',
                 name = 'command'
             ),
@@ -793,8 +793,8 @@ def FilterFloatField(caption, name=None):
         widget = FilterRangeWidget(caption),
         prototypes = [
             ChoiceField(
-                widget = SelectWidget('', self.commands),
-                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                widget = SelectWidget(''),
+                choices = ('equals', 'not_equals', 'between', 'empty'),
                 default = 'equals',
                 name = 'command'
             ),
@@ -812,8 +812,8 @@ def FilterDecimalField(caption, name=None):
         widget = FilterRangeWidget(caption),
         prototypes = [
             ChoiceField(
-                widget = SelectWidget('', self.commands),
-                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                widget = SelectWidget(''),
+                choices = ('equals', 'not_equals', 'between', 'empty'),
                 default = 'equals',
                 name = 'command'
             ),
@@ -832,7 +832,7 @@ def FilterDateField(caption, name=None):
         prototypes = [
             ChoiceField(
                 widget = SelectWidget(''),
-                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                choices = ('equals', 'not_equals', 'between', 'empty'),
                 default = 'equals',
                 name = 'command'
             ),
@@ -851,7 +851,7 @@ def FilterDateTimeField(widget, name=None):
         prototypes = [
             ChoiceField(
                 widget = SelectWidget(''),
-                choices = ('starts_with', 'contains', 'equals', 'not_equals', 'empty'),
+                choices = ('equals', 'not_equals', 'between', 'empty'),
                 default = 'equals',
                 name = 'command'
             ),
