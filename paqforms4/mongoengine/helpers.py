@@ -56,7 +56,7 @@ def _(model_field, form_field, command, name, value, filters, tz):
             filters[name] = {'$gte': value['min']}
         elif (value['max'] or value['max'] == 0):
             filters[name] = {'$lte': value['max']}
-        if value['unit']:
+        if 'unit' in value and value['unit']:
             filters[name + '_unit'] = value['unit']
 
     def empty(name, value, filters):
