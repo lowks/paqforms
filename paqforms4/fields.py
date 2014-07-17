@@ -94,8 +94,9 @@ class DeclarativeMeta(OrderedClass):
 
 # FIELDS =======================================================================
 class Prototype(metaclass=OrderedClass):
-    def __init__(self, name):
+    def __init__(self, meta, name):
         self.name = name
+        self.meta = meta.copy()
         self.master = None
 
 
@@ -158,7 +159,7 @@ class Prototype(metaclass=OrderedClass):
 class Field(Prototype, metaclass=OrderedClass):
     autorender = True
 
-    def __init__(self, widget, default=None, required=False, converters=[], validators=[], name=None):
+    def __init__(self, widget, default=None, required=False, converters=[], validators=[], meta={}, name=None):
         self.widget = widget
         self.default = default
         self.required = required
@@ -172,7 +173,7 @@ class Field(Prototype, metaclass=OrderedClass):
         except TypeError:
             self.validators = [validators]
 
-        Prototype.__init__(self, name)
+        Prototype.__init__(self, meta, name)
 
 
     def clone(self):
@@ -264,7 +265,7 @@ class Field(Prototype, metaclass=OrderedClass):
 
 
 class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (need to check length!)
-    def __init__(self, widget, prototype, default=[], required=False, converters=[], validators=[], name=None):
+    def __init__(self, widget, prototype, default=[], required=False, converters=[], validators=[], meta={}, name=None):
         self.widget = FieldFieldWidget(widget) if isinstance(widget, str) else widget
         if isinstance(prototype, Prototype):
             self.prototype = prototype
@@ -283,7 +284,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
             self.validators = [validators]
 
         self.fields = []
-        Prototype.__init__(self, name)
+        Prototype.__init__(self, meta, name)
 
 
     def clone(self):
@@ -398,8 +399,7 @@ class FormField(Prototype, metaclass=OrderedClass):
             self.validators = [validators]
 
         self.fields = OrderedDict()
-        Prototype.__init__(self, name)
-        self.meta = meta.copy()
+        Prototype.__init__(self, meta, name)
 
 
     def __iter__(self):
@@ -546,10 +546,11 @@ class BaseForm(FormField, metaclass=DeclarativeMeta):
         submit = None,
         locale = None,
         translations = nt,
+        meta = {},
         name = None,
     ):
         name = name or self.meta.get('name', None)
-        FormField.__init__(self, FormWidget(''), self.prototypes, default, name=name)
+        FormField.__init__(self, FormWidget(''), self.prototypes, default, meta=meta, name=name)
         self._locale = babel.core.Locale.parse(locale or 'en')
         self._translations = get_translations(self._locale) if isinstance(translations, gettext.NullTranslations) else translations
         self.feed(model, data, submit)
@@ -586,11 +587,12 @@ class ChoiceField(Field):
         required = False,
         converters = [StrConverter()],
         validators = [],
+        meta = {},
         name = None
     ):
         widget = SelectWidget(widget) if isinstance(widget, str) else widget
         self.choices = choices
-        Field.__init__(self, widget, default, required, converters, validators, name)
+        Field.__init__(self, widget, default, required, converters, validators, meta, name)
 
 
     # LOW-LEVEL API
@@ -627,11 +629,12 @@ class MultiChoiceField(Field):
         required = False,
         converters = MapConverter(converter=StrConverter()),
         validators = [],
+        meta = {},
         name = None
     ):
         widget = MultiCheckboxWidget(widget) if isinstance(widget, str) else widget
         self.choices = choices
-        Field.__init__(self, widget, default, required, converters, validators, name)
+        Field.__init__(self, widget, default, required, converters, validators, meta, name)
 
 
     # HIGH-LEVEL API
@@ -672,27 +675,27 @@ class MultiChoiceField(Field):
 
 
 # SHORTCUTS ====================================================================
-def TextField(widget, default=None, required=False, converters=StrConverter(), validators=LengthValidator(max=255), name=None):
+def TextField(widget, default=None, required=False, converters=StrConverter(), validators=LengthValidator(max=255), meta={}, name=None):
     widget = TextWidget(widget) if isinstance(widget, str) else widget
-    return Field(widget, default, required, converters, validators, name=name)
+    return Field(widget, default, required, converters, validators, meta=meta, name=name)
 
 
-def CheckField(widget, default=None, required=False, validators=[], name=None):
+def CheckField(widget, default=None, required=False, validators=[], meta={}, name=None):
     widget = CheckboxWidget(widget) if isinstance(widget, str) else widget
-    return Field(widget, default, required, converters=BoolConverter(none=False), validators=validators, name=name)
+    return Field(widget, default, required, converters=BoolConverter(none=False), validators=validators, meta=meta, name=name)
 
 
-def DateField(widget, default=None, required=False, validators=[], name=None):
+def DateField(widget, default=None, required=False, validators=[], meta={}, name=None):
     widget = DateWidget(widget) if isinstance(widget, str) else widget
-    return Field(widget, converters=DateConverter(), default=default, required=required, validators=validators, name=name)
+    return Field(widget, converters=DateConverter(), default=default, required=required, validators=validators, meta=meta, name=name)
 
 
-def DateTimeField(widget, default=None, required=False, validators=[], name=None):
+def DateTimeField(widget, default=None, required=False, validators=[], meta={}, name=None):
     widget = DateTimeWidget(widget) if isinstance(widget, str) else widget
-    return Field(widget, converters=DateTimeConverter(), default=default, required=required, validators=validators, name=name)
+    return Field(widget, converters=DateTimeConverter(), default=default, required=required, validators=validators, meta=meta, name=name)
 
 
-def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
+def BetweenIntField(widget, min=0, max=None, unit_field=None, meta={}, name=None):
     widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     if unit_field:
         unit_field.name = 'unit'
@@ -703,6 +706,7 @@ def BetweenIntField(widget, min=0, max=None, unit_field=None, name=None):
             Field(TextWidget(''), converters=[IntConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
             unit_field
         ],
+        meta = dict(meta, converter=IntConverter()),
         name = name
     )
 
@@ -718,11 +722,12 @@ def BetweenFloatField(widget, min=0.0, max=None, unit_field=None, name=None):
             Field(TextWidget(''), converters=[FloatConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
             unit_field
         ],
+        meta = dict(meta, converter=FloatConverter()),
         name = name
     )
 
 
-def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
+def BetweenDecimalField(widget, min=0, max=None, unit_field=None, meta={}, name=None):
     widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     if unit_field:
         unit_field.name = 'unit'
@@ -733,11 +738,12 @@ def BetweenDecimalField(widget, min=0, max=None, unit_field=None, name=None):
             Field(TextWidget(''), converters=[DecimalConverter()], validators=[ValueValidator(min=min, max=max)], name='max'),
             unit_field
         ],
+        meta = dict(meta, converter=DecimalConverter()),
         name = name
     )
 
 
-def BetweenDateField(widget, name=None):
+def BetweenDateField(widget, meta={}, name=None):
     widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     return FormField(
         widget = widget,
@@ -745,11 +751,12 @@ def BetweenDateField(widget, name=None):
             DateField('', name='min'),
             DateField('', name='max'),
         ],
+        meta = dict(meta, converter=DateConverter()),
         name = name
     )
 
 
-def BetweenDateTimeField(widget, name=None):
+def BetweenDateTimeField(widget, meta={}, name=None):
     widget = Widget(widget, template='BetweenWidget.html') if isinstance(widget, str) else widget
     return FormField(
         widget = widget,
@@ -757,11 +764,12 @@ def BetweenDateTimeField(widget, name=None):
             DateTimeField('', name='min'),
             DateTimeField('', name='max'),
         ],
+        meta = dict(meta, converter=DateTimeConverter()),
         name = name
     )
 
 
-def FilterTextField(caption, name=None):
+def FilterTextField(caption, meta={}, name=None):
     return FormField(
         widget = FilterTextWidget(caption),
         prototypes = [
@@ -777,11 +785,12 @@ def FilterTextField(caption, name=None):
             Field(TextWidget(''), converters=[StrConverter()], name='not_equals'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
+        meta = dict(meta, converter=StrConverter()),
         name = name
     )
 
 
-def FilterIntField(caption, name=None):
+def FilterIntField(caption, meta={}, name=None):
     return FormField(
         widget = FilterRangeWidget(caption),
         prototypes = [
@@ -796,11 +805,12 @@ def FilterIntField(caption, name=None):
             BetweenIntField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
+        meta = dict(meta, converter=IntConverter()),
         name = name
     )
 
 
-def FilterFloatField(caption, name=None):
+def FilterFloatField(caption, meta={}, name=None):
     return FormField(
         widget = FilterRangeWidget(caption),
         prototypes = [
@@ -815,11 +825,12 @@ def FilterFloatField(caption, name=None):
             BetweenFloatField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
+        meta = dict(meta, converter=FloatConverter()),
         name = name
     )
 
 
-def FilterDecimalField(caption, name=None):
+def FilterDecimalField(caption, meta={}, name=None):
     return FormField(
         widget = FilterRangeWidget(caption),
         prototypes = [
@@ -834,11 +845,12 @@ def FilterDecimalField(caption, name=None):
             BetweenDecimalField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
+        meta = dict(meta, converter=DecimalConverter()),
         name = name
     )
 
 
-def FilterDateField(caption, name=None):
+def FilterDateField(caption, meta={}, name=None):
     return FormField(
         widget = FilterRangeWidget(caption),
         prototypes = [
@@ -853,12 +865,12 @@ def FilterDateField(caption, name=None):
             BetweenDateField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
-        meta = {'converter': DateConverter()},
+        meta = dict(meta, converter=DateConverter()),
         name = name
     )
 
 
-def FilterDateTimeField(widget, name=None):
+def FilterDateTimeField(widget, meta={}, name=None):
     return FormField(
         widget = FilterRangeWidget(caption),
         prototypes = [
@@ -873,7 +885,7 @@ def FilterDateTimeField(widget, name=None):
             BetweenDateTimeField('', name='between'),
             ChoiceField(SelectWidget(''), choices=('*', 'yes', 'no'), default='*', name='empty')
         ],
-        meta = {'converter': DateTimeConverter()},
+        meta = dict(meta, converter=DateTimeConverter()),
         name = name
     )
 
