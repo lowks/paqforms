@@ -7,7 +7,7 @@ __all__ = (
 
 
 class ModelConverter:
-    def __init__(self, model_class=None):
+    def __init__(self, model_class):
         self.model_class = model_class
 
 
