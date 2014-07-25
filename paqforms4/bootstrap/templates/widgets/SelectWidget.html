@@ -9,23 +9,22 @@
             {% do attrs.update({'multiple': widget.multiple}) %}
             {% do attrs.update({'name': field.fullname}) %}
             {% do attrs.update({'id': field.fullname}) %}
+
             <select {{ attrs }}>
-                {% for i, value in enumerate(field.choices) %}
-                    {% if widget.options %}
-                        {% set optcaption = widget.options[i] %}
-                    {% else %}
+                {% for value, option in zip_longest(field.choices(), field.widget.options()) %}
+                    {% if option is none %}
                         {% if widget.get_option_caption %}
-                            {% set optcaption = widget.get_option_caption(value) %}
+                            {% set option = widget.get_option_caption(value) %}
                         {% else %}
-                            {% set optcaption = field.format_value(value) %}
+                            {% set option = field.format_value(value) %}
                         {% endif %}
                     {% endif %}
                     {% set optattrs = Attrs(value=field.format_value(value), selected=field.is_chosen(value)) %}
-                    {% if isinstance(optcaption, tuple) %}
-                        {% set optcaption, _optattrs = optcaption %}
+                    {% if isinstance(option, tuple) %}
+                        {% set option, _optattrs = optcaption %}
                         {% do optattrs.update(_optattrs) %}
                     {% endif %}
-                    <option {{ optattrs }}>{{ optcaption }}</option>
+                    <option {{ optattrs }}>{{ option }}</option>
                 {% endfor %}
             </select>
         {% endcall %}

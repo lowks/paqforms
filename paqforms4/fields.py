@@ -591,15 +591,19 @@ class ChoiceField(Field):
         name = None
     ):
         widget = SelectWidget(widget) if isinstance(widget, str) else widget
-        self.choices = choices
+        if choices:
+            self.choices = choices if callable(choices) else (lambda: choices)
+        else:
+            self.choices = lambda: []
         Field.__init__(self, widget, default, required, converters, validators, meta, name)
 
 
     # LOW-LEVEL API
     def validate_value(self, value):
         Field.validate_value(self, value)
-        if self.choices:
-            if value not in self.choices:
+        choices = self.choices()
+        if choices:
+            if value not in choices:
                 raise ValidationError(
                     self.translations.gettext('Invalid value {!r} for defined `choices`').format(value)
                 )
@@ -610,15 +614,6 @@ class ChoiceField(Field):
         #     return self.format_value(value) == self.feed_data
         # else:
         return value == self.value
-
-
-    def bind(self, master, index=None):
-        super().bind(master, index)
-        if callable(self.choices):
-            self.choices = self.choices()
-        if hasattr(self.widget, 'options') and callable(self.widget.options):
-            self.widget.options = self.widget.options()
-        return self
 
 
 class MultiChoiceField(Field):
@@ -633,7 +628,10 @@ class MultiChoiceField(Field):
         name = None
     ):
         widget = MultiCheckboxWidget(widget) if isinstance(widget, str) else widget
-        self.choices = choices
+        if choices:
+            self.choices = choices if callable(choices) else (lambda: choices)
+        else:
+            self.choices = lambda: []
         Field.__init__(self, widget, default, required, converters, validators, meta, name)
 
 
@@ -645,9 +643,10 @@ class MultiChoiceField(Field):
     # LOW-LEVEL API
     def validate_value(self, value):
         Field.validate_value(self, value)
-        if self.choices:
+        choices = self.choices()
+        if choices:
             for v in value:
-                if v not in self.choices:
+                if v not in choices:
                     raise ValidationError(
                         self.translations.gettext('Invalid value {!r} for defined `choices`').format(v)
                     )
@@ -664,14 +663,6 @@ class MultiChoiceField(Field):
         """value => data"""
         return Field.format_value(self, [value])[0]
 
-
-    def bind(self, master, index=None):
-        super().bind(master, index)
-        if callable(self.choices):
-            self.choices = self.choices()
-        if hasattr(self.widget, 'options') and callable(self.widget.options):
-            self.widget.options = self.widget.options()
-        return self
 
 
 # SHORTCUTS ====================================================================

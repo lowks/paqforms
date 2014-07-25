@@ -12,31 +12,29 @@
             {% endif %}
         </legend>
 
-        {% for i, value in enumerate(field.choices) %}
-            {% if widget.options %}
-                {% set cbcaption = widget.options[i] %}
-            {% else %}
+        {% for value, option in zip_longest(field.choices(), field.widget.options()) %}
+            {% if option is none %}
                 {% if widget.get_option_caption %}
-                    {% set cbcaption = widget.get_option_caption(value) %}
+                    {% set option = widget.get_option_caption(value) %}
                 {% else %}
-                    {% set cbcaption = field.format_value(value) %}
+                    {% set option = field.format_value(value) %}
                 {% endif %}
             {% endif %}
-            {% set cbattrs = Attrs(attrs,
+            {% set optattrs = Attrs(attrs,
                 type = 'checkbox',
                 value = field.format_value(value),
                 checked = field.is_chosen(value),
                 name = field.fullname ~ '-' ~ (i + 1),
                 id = field.fullname ~ '-' ~ field.format_value(value)
             ) %}
-            {% if isinstance(cbcaption, tuple) %}
-                {% set cbcaption, _cbattrs = cbcaption %}
-                {% do cbattrs.update(_cbattrs) %}
+            {% if isinstance(option, tuple) %}
+                {% set option, _optattrs = option %}
+                {% do optattrs.update(_optattrs) %}
             {% endif %}
 
             <div class="controls">
-                {% call print_label(field, cbcaption, attrs=Attrs(class='checkbox', for=cbattrs['id'], required=False)) %}
-                    <input {{ cbattrs }}/>
+                {% call print_label(field, option, attrs=Attrs(class='checkbox', for=optattrs['id'], required=False)) %}
+                    <input {{ optattrs }}/>
                 {% endcall %}
             </div>
         {% endfor %}

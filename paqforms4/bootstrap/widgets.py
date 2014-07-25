@@ -1,4 +1,5 @@
 import os.path as op; __dir__ = op.dirname(op.abspath(__file__))
+import itertools
 import html
 import jinja2
 
@@ -159,17 +160,33 @@ class TextareaWidget(Widget):
 class SelectWidget(Widget):
     def __init__(self, caption, options=[], get_option_caption=None, multiple=False, attrs={}, template=None, template_dirs=[], **context):
         Widget.__init__(self, caption, attrs, template, template_dirs, **context)
-        self.options = options
+        if options:
+            self.options = options if callable(options) else (lambda: options)
+        else:
+            self.options = lambda: []
         self.get_option_caption = get_option_caption
         self.multiple = multiple
+
+
+    def __call__(self, field, attrs={}, **context):
+        context['zip_longest'] = itertools.zip_longest
+        return Widget.__call__(self, field, attrs, **context)
 
 
 class MultiCheckboxWidget(Widget):
     def __init__(self, caption, options=[], get_option_caption=None, show_toggler=True, attrs={}, template=None, template_dirs=[], **context):
         Widget.__init__(self, caption, attrs, template, template_dirs, **context)
-        self.options = options
+        if options:
+            self.options = options if callable(options) else (lambda: options)
+        else:
+            self.options = lambda: []
         self.get_option_caption = get_option_caption
         self.show_toggler = show_toggler
+
+
+    def __call__(self, field, attrs={}, **context):
+        context['zip_longest'] = itertools.zip_longest
+        return Widget.__call__(self, field, attrs, **context)
 
 
 # FILTER WIDGETS
