@@ -49,14 +49,18 @@ def _(converter, command, name, value, filters, tz):
         filters[name] = {'$ne': value}
 
     def between(name, value, filters):
-        if (value['min'] or value['min'] == 0) and (value['max'] or value['max'] == 0):
+        hasmin = bool(value['min']) or (value['min'] == 0)
+        hasmax = bool(value['max']) or (value['max'] == 0)
+
+        if hasmin and hasmax:
             filters[name] = {'$gte': value['min'], '$lte': value['max']}
-        elif (value['min'] or value['min'] == 0):
+        elif hasmin:
             filters[name] = {'$gte': value['min']}
-        elif (value['max'] or value['max'] == 0):
+        elif hasmax:
             filters[name] = {'$lte': value['max']}
-        if 'unit' in value and value['unit']:
-            filters[name + '_unit'] = value['unit']
+        if hasmin or hasmax:
+            if value.get('unit'):
+                filters[name + '_unit'] = value['unit']
 
     def empty(name, value, filters):
         if value == 'yes':
@@ -91,12 +95,12 @@ def _(converter, command, name, value, filters, tz):
             filters[name] = {'$ne': None}
 
     def between(name, value, filters):
-            if value['min'] and value['max']:
-                filters[name] = {'$gte': value['min'], '$lte': value['max']}
-            elif value['min']:
-                filters[name] = {'$gte': value['min']}
-            elif value['max']:
-                filters[name] = {'$lte': value['max']}
+        if value['min'] and value['max']:
+            filters[name] = {'$gte': value['min'], '$lte': value['max']}
+        elif value['min']:
+            filters[name] = {'$gte': value['min']}
+        elif value['max']:
+            filters[name] = {'$lte': value['max']}
 
     locals()[command](name, value, filters)
 
