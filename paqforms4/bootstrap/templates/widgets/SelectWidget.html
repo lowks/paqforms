@@ -25,6 +25,10 @@
                         {% do optattrs.update(_optattrs) %}
                     {% endif %}
                     <option {{ optattrs }}>{{ option }}</option>
+                {% else %}
+                    {% if not field.value is none %}
+                        <option value="{{ field.format() }}" selected>{{ field.format() }}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
         {% endcall %}
