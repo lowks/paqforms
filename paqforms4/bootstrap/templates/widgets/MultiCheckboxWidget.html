@@ -12,7 +12,8 @@
             {% endif %}
         </legend>
 
-        {% for value, option in zip_longest(field.choices(), field.widget.options()) %}
+        {% for i, data in enumerate(zip_longest(field.choices(), field.widget.options())) %}
+            {% set value, option = data %}
             {% if option is none %}
                 {% if widget.get_option_caption %}
                     {% set option = widget.get_option_caption(value) %}
