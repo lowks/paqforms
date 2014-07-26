@@ -1,7 +1,7 @@
 <div>
     {% for key in ['success', 'error', 'info', 'warning'] %}
         {% if field.messages.get(key) %}
-            <small class="text-{{ key }}">{{ '. '.join(field.messages[key]) }}</small>
+            <small class="help-block">{{ '. '.join(field.messages[key]) }}</small>
         {% endif %}
     {% endfor %}
 </div>
