@@ -143,19 +143,19 @@ def render_append(attrs):
 
 def render_messages(messages):
     if messages.get('error'):
-        error = """<small class="text-error">{}</small>""".format('. '.join(messages.get('error', [])))
+        error = """<small class="help-block">{}</small>""".format('. '.join(messages.get('error', [])))
     else:
         error = ""
     if messages.get('warning'):
-        warning = """<small class="text-warning">{}</small>""".format('. '.join(messages.get('warning', [])))
+        warning = """<small class="help-block">{}</small>""".format('. '.join(messages.get('warning', [])))
     else:
         warning = ""
     if messages.get('info'):
-        info = """<small class="text-info">{}</small>""".format('. '.join(messages.get('info', [])))
+        info = """<small class="help-block">{}</small>""".format('. '.join(messages.get('info', [])))
     else:
         info = ""
     if messages.get('success'):
-        success = """<small class="text-success">{}</small>""".format('. '.join(messages.get('success', [])))
+        success = """<small class="help-block">{}</small>""".format('. '.join(messages.get('success', [])))
     else:
         success = ""
     if error or warning or info or success:

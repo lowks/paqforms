@@ -9,13 +9,13 @@
     {% set attrs = Attrs.take_prefixed(attrs, 'group-') %}
     {% do attrs.update({'class': attrs['class'] + 'form-group'}) %}
     {% if field.messages.error %}
-        {% do attrs.update({'class': attrs['class'] + 'error'}) %}
+        {% do attrs.update({'class': attrs['class'] + 'has-error'}) %}
     {% elif field.messages.success %}
-        {% do attrs.update({'class': attrs['class'] + 'success'}) %}
+        {% do attrs.update({'class': attrs['class'] + 'has-success'}) %}
     {% elif field.messages.warning %}
-        {% do attrs.update({'class': attrs['class'] + 'warning'})%}
+        {% do attrs.update({'class': attrs['class'] + 'has-warning'})%}
     {% elif field.messages.info %}
-        {% do attrs.update({'class': attrs['class'] + 'info'}) %}
+        {% do attrs.update({'class': attrs['class'] + 'has-info'}) %}
     {% endif %}
     {% if not widget.caption %}
         {% do attrs.update({'class': attrs['class'] + 'nocaption'}) %}
