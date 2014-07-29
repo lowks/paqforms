@@ -8,9 +8,9 @@ def get_sorts(sortform):
             if isinstance(field.value, str):
                 value = field.value.lower()
                 if value == 'asc':
-                    sorts.append('+name')
+                    sorts.append('+' + name)
                 elif value == 'desc':
-                    sorts.append('-name')
+                    sorts.append('-' + name)
                 else:
                     raise ValueError('Invalid value {!r} for field {!r}'.format(value, field))
             else:
