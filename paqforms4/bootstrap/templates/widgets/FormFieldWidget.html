@@ -6,7 +6,7 @@
     <div class="controls">
         <div class="{% if widget.inline %} form-inline{% endif %}{% if widget.compact %} form-compact{% endif %}">
             {% for subfield in field.fields.values() %}
-                {{ subfield(attrs=Attrs.take_prefixed(attrs, subfield.name)) }}
+                {{ subfield(attrs=Attrs.take_prefixed(attrs, subfield.name ~ '-')) }}
             {% endfor %}
         </div>
     </div>
