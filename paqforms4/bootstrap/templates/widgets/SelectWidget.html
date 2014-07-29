@@ -21,7 +21,7 @@
                     {% endif %}
                     {% set optattrs = Attrs(value=field.format_value(value), selected=field.is_chosen(value)) %}
                     {% if isinstance(option, tuple) %}
-                        {% set option, _optattrs = optcaption %}
+                        {% set option, _optattrs = option %}
                         {% do optattrs.update(_optattrs) %}
                     {% endif %}
                     <option {{ optattrs }}>{{ option }}</option>
