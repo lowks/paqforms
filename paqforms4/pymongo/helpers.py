@@ -24,10 +24,12 @@ def _(converter, command, name, value, filters, tz):
             filters[name] = {'$regex': '^' + value, '$options': '-i'} # TODO -i breaks index support
 
     def equals(name, value, filters):
-        filters[name] = value
+        if value:
+            filters[name] = value
 
     def not_equals(name, value, filters):
-        filters[name] = {'$ne': value}
+        if value:
+            filters[name] = {'$ne': value}
 
     def empty(name, value, filters):
         if value == 'yes':
@@ -43,10 +45,12 @@ def _(converter, command, name, value, filters, tz):
 @value_to_query.register(DecimalConverter)
 def _(converter, command, name, value, filters, tz):
     def equals(name, value, filters):
-        filters[name] = value
+        if value is not None:
+            filters[name] = value
 
     def not_equals(name, value, filters):
-        filters[name] = {'$ne': value}
+        if value is not None:
+            filters[name] = {'$ne': value}
 
     def between(name, value, filters):
         hasmin = bool(value['min']) or (value['min'] == 0)
