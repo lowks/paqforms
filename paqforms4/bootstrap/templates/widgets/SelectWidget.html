@@ -13,8 +13,8 @@
             <select {{ attrs }}>
                 {% for value, option in zip_longest(field.choices(), field.widget.options()) %}
                     {% if option is none %}
-                        {% if widget.get_option_caption %}
-                            {% set option = widget.get_option_caption(value) %}
+                        {% if widget.get_option %}
+                            {% set option = widget.get_option(value) %}
                         {% else %}
                             {% set option = field.format_value(value) %}
                         {% endif %}

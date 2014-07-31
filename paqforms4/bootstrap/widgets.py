@@ -158,13 +158,16 @@ class TextareaWidget(Widget):
 
 
 class SelectWidget(Widget):
-    def __init__(self, caption, options=[], get_option_caption=None, multiple=False, attrs={}, template=None, template_dirs=[], **context):
+    def __init__(self, caption, options=[], get_option=None, multiple=False, attrs={}, template=None, template_dirs=[], **context):
         Widget.__init__(self, caption, attrs, template, template_dirs, **context)
         if options:
             self.options = options if callable(options) else (lambda: options)
         else:
             self.options = lambda: []
-        self.get_option_caption = get_option_caption
+        if isinstance(get_option, str):
+            self.get_option = lambda model: getattr(model, get_option) if model else ''
+        else:
+            self.get_option = get_option
         self.multiple = multiple
 
 
@@ -174,13 +177,16 @@ class SelectWidget(Widget):
 
 
 class MultiCheckboxWidget(Widget):
-    def __init__(self, caption, options=[], get_option_caption=None, show_toggler=True, attrs={}, template=None, template_dirs=[], **context):
+    def __init__(self, caption, options=[], get_option=None, show_toggler=True, attrs={}, template=None, template_dirs=[], **context):
         Widget.__init__(self, caption, attrs, template, template_dirs, **context)
         if options:
             self.options = options if callable(options) else (lambda: options)
         else:
             self.options = lambda: []
-        self.get_option_caption = get_option_caption
+        if isinstance(get_option, str):
+            self.get_option = lambda model: getattr(model, get_option) if model else ''
+        else:
+            self.get_option = get_option
         self.show_toggler = show_toggler
 
 
