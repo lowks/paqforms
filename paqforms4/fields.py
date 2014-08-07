@@ -261,7 +261,7 @@ class Field(Prototype, metaclass=OrderedClass):
 
     def validate_value(self, value):
         for validator in self.validators:
-            validator(self.value, self)
+            validator(value, self)
 
 
 class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (need to check length!)
@@ -375,7 +375,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
 
     def validate_value(self, value):
         for validator in self.validators:
-            validator(self.value, self)
+            validator(value, self)
 
 
 class FormField(Prototype, metaclass=OrderedClass):
@@ -532,7 +532,7 @@ class FormField(Prototype, metaclass=OrderedClass):
 
     def validate_value(self, value):
         for validator in self.validators:
-            validator(self.value, self)
+            validator(value, self)
 
 
 class BaseForm(FormField, metaclass=DeclarativeMeta):
