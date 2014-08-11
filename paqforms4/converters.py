@@ -258,6 +258,23 @@ class SplitConverter:
         return data
 
 
+class ListConverter:
+    def parse(self, data, locale='en'):
+        if data is None:
+            return []
+        elif isinstance(data, str):
+            return [data]
+        elif isinstance(data, collections.Sequence):
+            return data
+        else:
+            return [data]
+
+
+    def format(self, value, locale='en'):
+        return value
+
+
+
 class FilterConverter:
     def __init__(self, func=None):
         self.func = func
@@ -335,5 +352,5 @@ class MapConverter:
 __all__ = (
     'StrConverter', 'BoolConverter', 'IntConverter', 'FloatConverter',
     'DecimalConverter', 'DateConverter', 'DateTimeConverter', 'CutNonNumConverter',
-    'SplitConverter', 'FilterConverter', 'FilterValueConverter', 'MapConverter',
+    'SplitConverter', 'FilterConverter', 'FilterValueConverter', 'ListConverter', 'MapConverter',
 )
