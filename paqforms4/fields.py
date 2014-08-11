@@ -622,7 +622,7 @@ class MultiChoiceField(Field):
         choices = [],
         default = [],
         required = False,
-        converters = MapConverter(converter=StrConverter()),
+        converters = [ListConverter(), MapConverter(converter=StrConverter())],
         validators = [],
         meta = {},
         name = None
