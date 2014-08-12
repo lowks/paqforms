@@ -162,7 +162,7 @@ class Field(Prototype, metaclass=OrderedClass):
     def __init__(self, widget, default=None, required=False, converters=[], validators=[], meta={}, name=None):
         self.widget = widget
         self.default = default
-        self.required = required
+        self.required = required if callable(required) else lambda: required
 
         self.converters = converters if isinstance(converters, (list, tuple,)) else (converters,)
         self.validators = validators if isinstance(validators, (list, tuple,)) else (validators,)
@@ -212,7 +212,7 @@ class Field(Prototype, metaclass=OrderedClass):
             try:
                 self.value = self.parse_data(data)
                 if self.value is None or self.value == []:
-                    if (callable(self.required) and self.required()) or (not callable(self.required) and self.required):
+                    if self.required():
                         raise ValidationError(self.translations.gettext('Fill the field'))
                 else:
                     self.validate_value(self.value)
@@ -266,7 +266,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
         else:
             raise ValueError('invalid `prototype` argument')
         self.default = default # TODO not in use yet
-        self.required = required
+        self.required = required if callable(required) else lambda: required
 
         self.converters = converters if isinstance(converters, (list, tuple,)) else (converters,)
         self.validators = validators if isinstance(validators, (list, tuple,)) else (validators,)
@@ -336,7 +336,7 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
         try:
             self.value = self.convert_value(self.value)
             if not self.value:
-                if (callable(self.required) and self.required()) or (not callable(self.required) and self.required):
+                if self.required:
                     raise ValidationError(self.translations.gettext('Fill the field'))
             else:
                 self.validate_value(self.value)
@@ -440,10 +440,9 @@ class FormField(Prototype, metaclass=OrderedClass):
         return False
 
 
-    @property
     def required(self):
         for prototype in self.prototypes.values():
-            if hasattr(prototype, 'required') and prototype.required:
+            if hasattr(prototype, 'required') and prototype.required():
                 return True
         return False
 
@@ -487,7 +486,7 @@ class FormField(Prototype, metaclass=OrderedClass):
         try:
             self.value = self.convert_value(self.value)
             if not self.value:
-                if (callable(self.required) and self.required()) or (not callable(self.required) and self.required):
+                if self.required():
                     raise ValidationError(self.translations.gettext('Fill the field'))
             else:
                 self.validate_value(self.value)
