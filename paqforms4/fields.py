@@ -164,14 +164,8 @@ class Field(Prototype, metaclass=OrderedClass):
         self.default = default
         self.required = required
 
-        try:
-            self.converters = list(iter(converters))
-        except TypeError:
-            self.converters = [converters]
-        try:
-            self.validators = list(iter(validators))
-        except TypeError:
-            self.validators = [validators]
+        self.converters = converters if isinstance(converters, (list, tuple,)) else (converters,)
+        self.validators = validators if isinstance(validators, (list, tuple,)) else (validators,)
 
         Prototype.__init__(self, meta, name)
 
@@ -274,14 +268,8 @@ class FieldField(Prototype, metaclass=OrderedClass): # TODO add validators! (nee
         self.default = default # TODO not in use yet
         self.required = required
 
-        try:
-            self.converters = list(iter(converters))
-        except TypeError:
-            self.converters = [converters]
-        try:
-            self.validators = list(iter(validators))
-        except TypeError:
-            self.validators = [validators]
+        self.converters = converters if isinstance(converters, (list, tuple,)) else (converters,)
+        self.validators = validators if isinstance(validators, (list, tuple,)) else (validators,)
 
         self.fields = []
         Prototype.__init__(self, meta, name)
@@ -389,14 +377,8 @@ class FormField(Prototype, metaclass=OrderedClass):
             self.prototypes = OrderedDict([(name, p) for name, p in prototypes.items() if p])
         self.default = default
 
-        try:
-            self.converters = list(iter(converters))
-        except TypeError:
-            self.converters = [converters]
-        try:
-            self.validators = list(iter(validators))
-        except TypeError:
-            self.validators = [validators]
+        self.converters = converters if isinstance(converters, (list, tuple,)) else (converters,)
+        self.validators = validators if isinstance(validators, (list, tuple,)) else (validators,)
 
         self.fields = OrderedDict()
         Prototype.__init__(self, meta, name)
