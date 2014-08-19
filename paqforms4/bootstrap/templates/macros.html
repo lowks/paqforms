@@ -58,7 +58,7 @@
     {% set attrs = attrs.copy() %}
     {% do attrs.update({'class': attrs['class'] ~ ' control-label'}) %}
     {% do attrs.update({'for': attrs['for'] or field.fullname}) %}
-    {% do attrs.update({'required': attrs.get('required', field.required())}) %}
+    {% do attrs.update({'required': field.required() if attrs.get('required', None) is none else attrs['required'] }) %}
     {% if caller %}
         <label {{ attrs }}>
             {{ caller() }} {{ caption or '&nbsp;' }}

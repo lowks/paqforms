@@ -26,7 +26,6 @@ class Widget:
 
     def __call__(self, field, attrs={}, **context):
         attrs = Attrs(self.attrs, attrs)
-        attrs['required'] = attrs.get('required', False) or getattr(field, 'required', False)
 
         # MAIN
         context = dict(self.context, **context)
