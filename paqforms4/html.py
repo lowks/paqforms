@@ -172,24 +172,7 @@ def render_messages(messages):
     return Markup(messages)
 
 
-def render_label(field, caption, attrs={}, description=None, tooltip=None):
-    attrs = Attrs(attrs.copy())
-    attrs['for'] = field.fullname
-    attrs['required'] = attrs['required'] or field.required
-    return Markup(
-        """
-        <label class="control-label" {attrs}>{caption}{description}{tooltip}</label>
-        """.format(
-            attrs = Attrs(attrs),
-            caption = caption,
-            description = (""" <span class="muted">{}</span>""".format(description) if description else ''),
-            tooltip = (""" <a href="#" data-toggle="tooltip" title="{}"><i class="fa fa-question-circle"></i></a>""".format(tooltip) if tooltip else '')
-        )
-    )
-
-
 __all__ = (
     'Attr', 'Attrs',
     'render_prepend', 'render_append', 'render_messages',
-    'render_label',
 )
