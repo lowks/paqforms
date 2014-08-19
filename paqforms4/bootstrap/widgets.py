@@ -33,6 +33,7 @@ class Widget:
         context.setdefault('widget', self)
 
         # PYTHON COMMONS
+        context['str'] = str
         context['any'] = any
         context['enumerate'] = enumerate
         context['isinstance'] = isinstance
