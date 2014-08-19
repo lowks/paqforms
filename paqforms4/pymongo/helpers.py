@@ -9,12 +9,12 @@ from ..converters import *
 
 
 @singledispatch
-def value_to_query(converter, command, name, value, filters, tz):
+def value_to_query(converter, command, name, value, filter):
     pass # Do nothing (keep filters as is)
 
 
 @value_to_query.register(StrConverter)
-def _(converter, command, name, value, filters, tz):
+def _(converter, command, name, value, filters):
     def contains(name, value, filters):
         if value:
             filters[name] = {'$regex': value, '$options': '-i'} # TODO -i breaks index support
@@ -43,7 +43,7 @@ def _(converter, command, name, value, filters, tz):
 @value_to_query.register(IntConverter)
 @value_to_query.register(FloatConverter)
 @value_to_query.register(DecimalConverter)
-def _(converter, command, name, value, filters, tz):
+def _(converter, command, name, value, filters):
     def equals(name, value, filters):
         if value is not None:
             filters[name] = value
@@ -76,17 +76,16 @@ def _(converter, command, name, value, filters, tz):
 
 
 @value_to_query.register(DateTimeConverter)
-def _(converter, command, name, value, filters, tz):
-    # Treat datetime as datetime
+def _(converter, command, name, value, filters):
     def equals(name, value, filters):
         if value:
-            samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
+            samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second)
             nextsec = samesec + timedelta(seconds=1)
             filters[name] = {'$gte': samesec, '$lt': nextsec}
 
     def not_equals(name, value, filters):
         if value:
-            samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second, tzinfo=tz)
+            samesec = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second)
             nextsec = samesec + timedelta(seconds=1)
             filters.setdefault('$or', []).extend(
                 [{name: {'$lt': samesec}}, {name: {'$gte': nextsec}}]
@@ -110,17 +109,16 @@ def _(converter, command, name, value, filters, tz):
 
 
 @value_to_query.register(DateConverter)
-def _(converter, command, name, value, filters, tz):
-    # Treat datetime as date
+def _(converter, command, name, value, filters):
     def equals(name, value, filters):
         if value:
-            sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
+            sameday = datetime(value.year, value.month, value.day)
             nextday = sameday + timedelta(hours=24)
             filters[name] =  {'$gte': sameday, '$lt': nextday}
 
     def not_equals(name, value, filters):
         if value:
-            sameday = datetime(value.year, value.month, value.day, tzinfo=tz)
+            sameday = datetime(value.year, value.month, value.day)
             nextday = sameday + timedelta(hours=24)
             filters.setdefault('$or', []).extend(
                 [{name: {'$lt': sameday}}, {name: {'$gte': nextday}}]
@@ -128,15 +126,15 @@ def _(converter, command, name, value, filters, tz):
 
     def between(name, value, filters):
         if value['min'] and value['max']:
-            minday = datetime(value['min'].year, value['min'].month, value['min'].day, tzinfo=tz)
-            maxday = datetime(value['max'].year, value['max'].month, value['max'].day, tzinfo=tz)
+            minday = datetime(value['min'].year, value['min'].month, value['min'].day)
+            maxday = datetime(value['max'].year, value['max'].month, value['max'].day)
             maxday = maxday + timedelta(days=1)
             filters[name] = {'$gte': minday, '$lt': maxday}
         elif value['min']:
-            minday = datetime(value['min'].year, value['min'].month, value['min'].day, tzinfo=tz)
+            minday = datetime(value['min'].year, value['min'].month, value['min'].day)
             filters[name] = {'$gte': minday}
         elif value['max']:
-            maxday = datetime(value['max'].year, value['max'].month, value['max'].day, tzinfo=tz)
+            maxday = datetime(value['max'].year, value['max'].month, value['max'].day)
             maxday = maxday + timedelta(days=1)
             filters[name] = {'$lt': maxday}
 
@@ -149,7 +147,7 @@ def _(converter, command, name, value, filters, tz):
     locals()[command](name, value, filters)
 
 
-def get_filters(filterform, tz=None):
+def get_filters(filterform):
     filters = {}
     for name, form_field in filterform:
         if hasattr(form_field, 'prototypes'):
@@ -157,15 +155,15 @@ def get_filters(filterform, tz=None):
                 command = form_field.value['command']
                 if command:
                     value_to_query(
-                        form_field.meta['converter'], command, name, form_field.value[command], filters, tz
+                        form_field.meta['converter'], command, name, form_field.value[command], filters
                     )
             elif 'min' in form_field.prototypes and 'max' in form_field.prototypes:
                 value_to_query(
-                    form_field.meta['converter'], 'between', name, form_field.value, filters, tz
+                    form_field.meta['converter'], 'between', name, form_field.value, filters
                 )
         elif form_field.meta.get('converter'):
             value_to_query(
-                form_field.meta.get('converter'), 'equals', name, form_field.value, filters, tz
+                form_field.meta.get('converter'), 'equals', name, form_field.value, filters
             )
     return filters
 
