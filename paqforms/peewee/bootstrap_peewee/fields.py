@@ -1,6 +1,6 @@
-from paqforms4.html import RenderableMixin
-from paqforms4.rest_peewee.fields import *
-from paqforms4.rest_peewee.fields import Choices
+from paqforms.html import RenderableMixin
+from paqforms.rest_peewee.fields import *
+from paqforms.rest_peewee.fields import Choices
 
 
 class QuerySelectField(QueryChoiceField, RenderableMixin):

@@ -1,4 +1,4 @@
-from paqforms4.i18n import get_translations
+from paqforms.i18n import get_translations
 
 
 def test_get_translations():

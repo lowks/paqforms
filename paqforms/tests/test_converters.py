@@ -2,7 +2,7 @@ import datetime
 import decimal
 from nose.tools import assert_raises
 
-from paqforms4.converters import *
+from paqforms.converters import *
 
 
 class _Test_StrConverter:

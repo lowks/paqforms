@@ -7,10 +7,10 @@ from werkzeug.datastructures import MultiDict
 from unittest.mock import Mock
 from nose.tools import assert_raises
 
-from paqforms4.converters import *
-from paqforms4.helpers import *
-from paqforms4.validators import *
-from paqforms4.fields import *
+from paqforms.converters import *
+from paqforms.helpers import *
+from paqforms.validators import *
+from paqforms.fields import *
 
 
 

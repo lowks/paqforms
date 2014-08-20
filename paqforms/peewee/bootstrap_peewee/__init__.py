@@ -1,5 +1,5 @@
-from paqforms4.rest_peewee import get_filters
-from paqforms4.bootstrap_peewee.fields import *
+from paqforms.rest_peewee import get_filters
+from paqforms.bootstrap_peewee.fields import *
 
 
 __all__ = [

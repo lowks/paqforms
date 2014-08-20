@@ -3,7 +3,7 @@ import re
 from unittest.mock import Mock
 from nose.tools import assert_raises
 
-from paqforms4.validators import *
+from paqforms.validators import *
 
 
 class Test_RepeatValidator:

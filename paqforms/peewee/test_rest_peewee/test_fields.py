@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import peewee
 
-from paqforms4.rest_peewee import *
+from paqforms.rest_peewee import *
 
 
 class Model(peewee.Model):

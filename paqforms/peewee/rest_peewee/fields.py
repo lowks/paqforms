@@ -1,10 +1,10 @@
 #encoding: utf8
 import peewee
 
-from paqforms4.converters import MapConverter
-from paqforms4.validators import RequiredValidator
-from paqforms4.rest_peewee.converters import ModelConverter
-from paqforms4.rest.fields import ChoiceField, MultiChoiceField
+from paqforms.converters import MapConverter
+from paqforms.validators import RequiredValidator
+from paqforms.rest_peewee.converters import ModelConverter
+from paqforms.rest.fields import ChoiceField, MultiChoiceField
 
 
 class Choices(object):

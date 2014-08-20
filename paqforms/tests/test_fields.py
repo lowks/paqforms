@@ -7,11 +7,11 @@ from werkzeug.datastructures import MultiDict
 from unittest.mock import Mock
 from nose.tools import assert_raises
 
-from paqforms4.converters import *
-from paqforms4.helpers import *
-from paqforms4.validators import *
-from paqforms4.fields import Field, FieldField, FormField
-from paqforms4.fields import *
+from paqforms.converters import *
+from paqforms.helpers import *
+from paqforms.validators import *
+from paqforms.fields import Field, FieldField, FormField
+from paqforms.fields import *
 
 
 class Post:
@@ -918,8 +918,8 @@ class Test_FlaskForm:
     def test(self):
         from flask import Request
         from flask.testing import EnvironBuilder
-        from paqforms4.i18n import get_translations
-        from paqforms4.bootstrap import FormWidget
+        from paqforms.i18n import get_translations
+        from paqforms.bootstrap import FormWidget
 
         class MyForm(BaseForm):
             def feed(self, value={}, data={}, submit=False):

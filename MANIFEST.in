@@ -1,1 +1,1 @@
-recursive-include paqforms4 *.py *.po .*mo .*html
+recursive-include paqforms *.py *.po .*mo .*html

@@ -1,6 +1,6 @@
 from markupsafe import Markup
 
-from paqforms4.html import *
+from paqforms.html import *
 from . import clean
 
 class Test_Attr:
