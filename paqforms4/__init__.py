@@ -16,7 +16,7 @@ __all__ = (
     # CONVERTERS
     'StrConverter', 'BoolConverter', 'IntConverter', 'FloatConverter',
     'DecimalConverter', 'DateConverter', 'DateTimeConverter', 'CutNonNumConverter',
-    'SplitConverter', 'FilterConverter', 'FilterValueConverter', 'MapConverter',
+    'SplitConverter', 'FilterConverter', 'FilterValueConverter', 'ListConverter', 'MapConverter',
 
     # VALIDATORS
     'LengthValidator', 'ValueValidator', 'OneOfValidator',
