@@ -21,11 +21,7 @@ declarative definitions.
 
 ## Installation
 
-
-`$ pip install git+https://github.com/ivan-kleshnin/paqforms4` <br/>
- or <br/>
 `$ pip install --upgrade git+https://github.com/ivan-kleshnin/paqforms4`
-
 
 ## FAQ
 
