@@ -1,4 +1,4 @@
-# PaqForms4
+# PaqForms
 
 Locale awared forms with bootstrap widgets
 
@@ -21,7 +21,7 @@ declarative definitions.
 
 ## Installation
 
-`$ pip install --upgrade git+https://github.com/ivan-kleshnin/paqforms4`
+`$ pip install --upgrade git+https://github.com/ivan-kleshnin/paqforms`
 
 ## FAQ
 
