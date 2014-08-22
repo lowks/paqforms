@@ -27,7 +27,7 @@
                     <option {{ optattrs }}>{{ option }}</option>
                 {% else %}
                     {% if not field.value is none %}
-                        <option value="{{ field.format() }}" selected>{{ field.format() }}</option>
+                        <option value="{{ field.format_value(field.value) }}" selected>{{ field.format_value(field.value) }}</option>
                     {% endif %}
                 {% endfor %}
             </select>
