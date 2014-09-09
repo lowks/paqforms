@@ -1,0 +1,45 @@
+/*
+Widgets
+*/
+.form-group[data-widget="MultiCheckbox"],
+.form-group[data-widget="MultiRadio"] {
+    legend {
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        font-size: inherit;
+        line-height: inherit;
+        label {
+            margin-bottom: 0;
+            font-size: inherit;
+            line-height: inherit;
+        }
+    }
+    .checkbox, .radio {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+fieldset[data-widget="FieldField"] {
+    .form-group.nocaption > .control-label {
+        display: none;
+    }
+}
+
+.form-group[data-widget="Access"] {
+    .dropdown {
+        .dropdown-toggle {
+            padding: 10px 0 0 4px;
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            > li {
+                .fa {
+                    width: 15px;
+                    margin-right: 8px;
+                    text-align: center;
+                }
+            }
+        }
+    }
+}
