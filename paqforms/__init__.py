@@ -5,7 +5,7 @@ from .validators import *
 from .fields import *
 from .bootstrap.widgets import *
 
-__version__ = '4.5'
+__version__ = '4.5.1'
 
 __all__ = (
     # EXCEPTIONS
